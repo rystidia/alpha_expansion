@@ -1,8 +1,7 @@
-#include <iostream>
-#include <cassert>
+#include <gtest/gtest.h>
 #include "energy.h"
 
-int main() {
+TEST(EnergyMinimization, BasicSubmodularEnergy) {
     // E(x, y, z) = x - 2*y + 3*(1-z) - 4*x*y + 5*|y-z|
     // x,y,z in {0,1}
     
@@ -25,12 +24,10 @@ int main() {
 
     EnergyT::TotalValue min_energy = e->minimize();
     
-    assert(min_energy == -5);
-    assert(e->get_var(varx) == 1);
-    assert(e->get_var(vary) == 1);
-    assert(e->get_var(varz) == 1);
+    EXPECT_EQ(min_energy, -5);
+    EXPECT_EQ(e->get_var(varx), 1);
+    EXPECT_EQ(e->get_var(vary), 1);
+    EXPECT_EQ(e->get_var(varz), 1);
 
     delete e;
-    std::cout << "test_basic_energy passed!" << std::endl;
-    return 0;
 }
