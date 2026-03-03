@@ -1,6 +1,12 @@
 #include <gtest/gtest.h>
 #include "BKSolver.hpp"
 #include "ORToolsSolver.hpp"
+#include "graph.cpp"
+#include "maxflow.cpp"
+
+template class Graph<int, int, int>;
+template class Energy<int, int, int>;
+
 #include <vector>
 #include <memory>
 #include <tuple>

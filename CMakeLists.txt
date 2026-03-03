@@ -5,11 +5,10 @@ set(CMAKE_CXX_STANDARD 17)
 
 # Core maxflow library
 add_library(graph_cuts STATIC
-    graph.cpp
-    maxflow.cpp
-    instances.cpp
+    src/graph.cpp
+    src/maxflow.cpp
 )
-target_include_directories(graph_cuts PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(graph_cuts PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # Testing setup
 include(FetchContent)
@@ -23,7 +22,7 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(alpha_expansion_tests tests.cpp)
+add_executable(alpha_expansion_tests tests/tests.cpp)
 target_link_libraries(alpha_expansion_tests
   graph_cuts
   GTest::gtest_main
