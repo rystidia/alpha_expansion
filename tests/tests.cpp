@@ -2,7 +2,6 @@
 #include "BKSolver.hpp"
 #include "ORToolsSolver.hpp"
 #include "graph.cpp"
-#include "maxflow.cpp"
 
 template class Graph<int, int, int>;
 template class Energy<int, int, int>;
@@ -11,18 +10,18 @@ template class Energy<int, int, int>;
 #include <memory>
 #include <tuple>
 
-class EnergyMinimizationTest : public ::testing::TestWithParam<std::function<MaxFlowSolver*(int, int)>> {
+class EnergyMinimizationTest : public ::testing::TestWithParam<std::function<MaxFlowSolver*(int, int)> > {
 protected:
-    MaxFlowSolver* create_solver(int vars, int edges) {
+    static MaxFlowSolver *create_solver(const int vars, const int edges) {
         return GetParam()(vars, edges);
     }
 };
 
 TEST_P(EnergyMinimizationTest, BasicSubmodularEnergy) {
-    auto e = std::unique_ptr<MaxFlowSolver>(create_solver(3, 5));
-    auto varx = e->add_variable();
-    auto vary = e->add_variable();
-    auto varz = e->add_variable();
+    const auto e = std::unique_ptr<MaxFlowSolver>(create_solver(3, 5));
+    const auto varx = e->add_variable();
+    const auto vary = e->add_variable();
+    const auto varz = e->add_variable();
 
     e->add_term1(varx, 0, 1);
     e->add_term1(vary, 0, -2);
@@ -37,7 +36,7 @@ TEST_P(EnergyMinimizationTest, BasicSubmodularEnergy) {
 }
 
 TEST_P(EnergyMinimizationTest, IndependentVariables) {
-    auto e = std::unique_ptr<MaxFlowSolver>(create_solver(5, 0));
+    const auto e = std::unique_ptr<MaxFlowSolver>(create_solver(5, 0));
     std::vector<MaxFlowSolver::Var> vars;
     for (int i = 0; i < 5; ++i) {
         vars.push_back(e->add_variable());
@@ -57,9 +56,9 @@ TEST_P(EnergyMinimizationTest, IndependentVariables) {
 }
 
 TEST_P(EnergyMinimizationTest, AttractivePotentials) {
-    auto e = std::unique_ptr<MaxFlowSolver>(create_solver(2, 1));
-    auto x = e->add_variable();
-    auto y = e->add_variable();
+    const auto e = std::unique_ptr<MaxFlowSolver>(create_solver(2, 1));
+    const auto x = e->add_variable();
+    const auto y = e->add_variable();
 
     e->add_term1(x, 100, 0);
     e->add_term1(y, 0, 10);
@@ -80,7 +79,7 @@ TEST_P(EnergyMinimizationTest, 1DChainMRF) {
     e->add_term1(vars[N - 1], 0, 1000);
 
     for (int i = 0; i < N - 1; ++i) {
-        e->add_term2(vars[i], vars[i+1], 0, 1, 1, 0);
+        e->add_term2(vars[i], vars[i + 1], 0, 1, 1, 0);
     }
 
     EXPECT_EQ(e->minimize(), 1);
@@ -100,7 +99,7 @@ TEST_P(EnergyMinimizationTest, 2DGridMRF) {
 
     for (int y = 0; y < H; ++y) {
         for (int x = 0; x < W; ++x) {
-            int i = y * W + x;
+            const int i = y * W + x;
             if (x < W - 1) e->add_term2(vars[i], vars[i + 1], 0, 1, 1, 0);
             if (y < H - 1) e->add_term2(vars[i], vars[i + W], 0, 1, 1, 0);
         }

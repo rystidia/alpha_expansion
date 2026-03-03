@@ -5,7 +5,6 @@
 
 // wrapper for the Boykov-Kolmogorov max-flow solver
 class BKSolver : public MaxFlowSolver {
-private:
     typedef Energy<int, int, int> EnergyT;
     EnergyT* e;
 

@@ -3,19 +3,16 @@
 #include "MaxFlowSolver.hpp"
 #include "ortools/graph/max_flow.h"
 #include <vector>
-#include <map>
 #include <cassert>
 
 // wrapper for the google or-tools max-flow solver
 class ORToolsSolver : public MaxFlowSolver {
-private:
     operations_research::SimpleMaxFlow max_flow_;
     int num_vars_;
     int source_node_;
     int sink_node_;
     EnergyValue e_const_;
     std::vector<bool> in_source_cut_;
-
 
 public:
     ORToolsSolver() : num_vars_(0), e_const_(0) {
@@ -57,17 +54,18 @@ public:
 
     void add_term2(Var x, Var y, EnergyValue A, EnergyValue B, EnergyValue C, EnergyValue D) override {
         this->add_tweights(x, D, A);
-        B -= A; C -= D;
+        B -= A;
+        C -= D;
 
         assert(B + C >= 0);
         if (B < 0) {
             this->add_tweights(x, 0, B);
             this->add_tweights(y, 0, -B);
-            this->add_edge(x, y, 0, B+C);
+            this->add_edge(x, y, 0, B + C);
         } else if (C < 0) {
             this->add_tweights(x, 0, -C);
             this->add_tweights(y, 0, C);
-            this->add_edge(x, y, B+C, 0);
+            this->add_edge(x, y, B + C, 0);
         } else {
             this->add_edge(x, y, B, C);
         }
@@ -78,7 +76,7 @@ public:
         std::vector<int> source_cut;
         max_flow_.GetSourceSideMinCut(&source_cut);
         in_source_cut_.assign(num_vars_ + 2, false);
-        for (int node : source_cut) {
+        for (int node: source_cut) {
             in_source_cut_[node] = true;
         }
 

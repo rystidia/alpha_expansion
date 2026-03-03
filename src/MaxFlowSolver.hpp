@@ -1,8 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <cstdint>
-
 typedef int32_t EnergyValue;
 
 class MaxFlowSolver {

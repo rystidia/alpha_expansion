@@ -15,10 +15,10 @@ template class Energy<int, int, int>;
 #include <memory>
 #include <tuple>
 
-class AlphaExpansionTest : public ::testing::TestWithParam<std::function<MaxFlowSolver*(int, int)>> {
+class AlphaExpansionTest : public ::testing::TestWithParam<std::function<MaxFlowSolver*(int, int)> > {
 protected:
-    AlphaExpansion::SolverFactory get_factory() {
-        return [this](int v, int e) {
+    static AlphaExpansion::SolverFactory get_factory() {
+        return [](const int v, const int e) {
             return std::unique_ptr<MaxFlowSolver>(GetParam()(v, e));
         };
     }
@@ -28,10 +28,10 @@ TEST_P(AlphaExpansionTest, Test2DGridDenosingMRF) {
     const int W = 5;
     const int H = 5;
     EnergyModel model(W * H, 3);
-    
+
     std::vector<int> noisy_image(W * H, 0);
     for (int i = 0; i < W * H; ++i) noisy_image[i] = i % 3;
-    
+
     model.set_unary_cost_fn([&](int node, int label) -> EnergyValue {
         int x = node % W;
         int y = node / W;
@@ -57,13 +57,13 @@ TEST_P(AlphaExpansionTest, Test2DGridDenosingMRF) {
     SequentialStrategy strategy;
 
     strategy.execute(optimizer, model);
-    
+
     EnergyValue final_energy = model.evaluate_total_energy();
-    
+
     EnergyValue start_energy = 0;
     for (int i = 0; i < W * H; ++i) {
         start_energy += model.get_unary_cost(i, 0);
-        for (int neighbor : model.get_neighbors(i)) {
+        for (int neighbor: model.get_neighbors(i)) {
             if (i < neighbor) {
                 start_energy += model.get_pairwise_cost(i, neighbor, 0, 0);
             }
