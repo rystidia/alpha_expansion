@@ -22,7 +22,7 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(alpha_expansion_tests tests/tests.cpp)
+add_executable(alpha_expansion_tests tests/tests.cpp tests/test_alpha_expansion.cpp)
 target_link_libraries(alpha_expansion_tests
   graph_cuts
   GTest::gtest_main
