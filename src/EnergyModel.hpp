@@ -41,6 +41,18 @@ public:
         return neighbors_[node];
     }
     
+    // returns a list of indices with label different from alpha_label
+    std::vector<int> get_active_nodes(int alpha_label) const {
+        std::vector<int> active_nodes;
+        active_nodes.reserve(num_nodes_);
+        for (int i = 0; i < num_nodes_; ++i) {
+            if (labels_[i] != alpha_label) {
+                active_nodes.push_back(i);
+            }
+        }
+        return active_nodes;
+    }
+    
     EnergyValue evaluate_total_energy() const {
         EnergyValue total = 0;
         for (int i = 0; i < num_nodes_; ++i) {
