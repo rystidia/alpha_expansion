@@ -31,3 +31,10 @@ target_link_libraries(alpha_expansion_tests
 
 include(GoogleTest)
 gtest_discover_tests(alpha_expansion_tests)
+
+# Google OR-Tools dependency
+find_package(ortools CONFIG REQUIRED)
+
+target_link_libraries(alpha_expansion_tests
+  ortools::ortools
+)
