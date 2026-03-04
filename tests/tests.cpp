@@ -1,10 +1,6 @@
 #include <gtest/gtest.h>
 #include "BKSolver.hpp"
 #include "ORToolsSolver.hpp"
-#include "graph.cpp"
-
-template class Graph<int, int, int>;
-template class Energy<int, int, int>;
 
 #include <vector>
 #include <memory>

@@ -57,7 +57,7 @@ public:
     [[nodiscard]] EnergyValue evaluate_total_energy(const std::vector<int> &eval_labels) const {
         EnergyValue total = 0;
         for (int i = 0; i < num_nodes_; ++i) {
-            total += get_unary_cost(i, labels_[i]);
+            total += get_unary_cost(i, eval_labels[i]);
             for (int neighbor : neighbors_[i]) {
                 if (i < neighbor) {
                     total += get_pairwise_cost(i, neighbor, eval_labels[i], eval_labels[neighbor]);

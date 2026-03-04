@@ -2,11 +2,13 @@ cmake_minimum_required(VERSION 3.14)
 project(alpha_expansion)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Core maxflow library
 add_library(graph_cuts STATIC
     src/graph.cpp
     src/maxflow.cpp
+    src/instances.cpp
 )
 target_include_directories(graph_cuts PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -37,3 +39,14 @@ find_package(ortools CONFIG REQUIRED)
 target_link_libraries(alpha_expansion_tests
   ortools::ortools
 )
+
+# Python bindings with pybind11
+FetchContent_Declare(
+  pybind11
+  GIT_REPOSITORY https://github.com/pybind/pybind11.git
+  GIT_TAG        v2.11.1
+)
+FetchContent_MakeAvailable(pybind11)
+
+pybind11_add_module(alpha_expansion_py src/bindings.cpp)
+target_link_libraries(alpha_expansion_py PRIVATE graph_cuts ortools::ortools)
