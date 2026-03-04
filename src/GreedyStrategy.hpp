@@ -9,7 +9,7 @@ public:
 
     void execute(AlphaExpansion &optimizer, EnergyModel &model) const {
         int num_labels = model.num_labels();
-        int cycle = 0;
+        int cycle = 0; // TODO: calculate cycles
         bool converged = false;
 
         while (!converged && cycle < max_cycles_) {

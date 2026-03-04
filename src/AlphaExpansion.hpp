@@ -73,14 +73,25 @@ public:
         solver->minimize();
 
         bool changed = false;
+        std::vector<int> proposed_labels = model_.get_labels();
+
         for (const int node: active_nodes) {
             if (const MaxFlowSolver::Var var = node_var_ids[node]; solver->get_var(var) == 0) {
-                model_.set_label(node, alpha_label);
+                proposed_labels[node] = alpha_label;
                 changed = true;
             }
         }
 
-        return changed;
+        if (changed) {
+            EnergyValue old_energy = model_.evaluate_total_energy();
+            EnergyValue new_energy = model_.evaluate_total_energy(proposed_labels);
+            if (new_energy < old_energy) {
+                model_.set_labels(proposed_labels);
+                return true;
+            }
+        }
+
+        return false;
     }
 
 private:
