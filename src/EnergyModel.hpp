@@ -20,6 +20,7 @@ public:
     [[nodiscard]] int get_label(int node) const { return labels_[node]; }
     void set_label(int node, int label) { labels_[node] = label; }
     [[nodiscard]] const std::vector<int>& get_labels() const { return labels_; }
+    void set_labels(const std::vector<int>& labels) { labels_ = labels; }
 
     void set_unary_cost_fn(UnaryCostFn fn) { unary_cost_fn_ = fn; }
     void set_pairwise_cost_fn(PairwiseCostFn fn) { pairwise_cost_fn_ = fn; }
