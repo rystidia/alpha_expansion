@@ -26,6 +26,8 @@ PYBIND11_MODULE(alpha_expansion_py, m) {
         .def("set_labels", &EnergyModel::set_labels, py::arg("labels"))
         .def("set_unary_cost_fn", &EnergyModel::set_unary_cost_fn, py::arg("fn"))
         .def("set_pairwise_cost_fn", &EnergyModel::set_pairwise_cost_fn, py::arg("fn"))
+        .def("set_unary_costs", &EnergyModel::set_unary_costs, py::arg("costs"))
+        .def("set_pairwise_costs", &EnergyModel::set_pairwise_costs, py::arg("costs"))
         .def("get_unary_cost", &EnergyModel::get_unary_cost, py::arg("node"), py::arg("label"))
         .def("get_pairwise_cost", &EnergyModel::get_pairwise_cost, py::arg("node1"), py::arg("node2"), py::arg("label1"), py::arg("label2"))
         .def("add_neighbor", &EnergyModel::add_neighbor, py::arg("node1"), py::arg("node2"))

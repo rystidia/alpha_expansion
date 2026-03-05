@@ -26,11 +26,31 @@ public:
     void set_pairwise_cost_fn(PairwiseCostFn fn) { pairwise_cost_fn_ = fn; }
 
     [[nodiscard]] EnergyValue get_unary_cost(int node, int label) const {
+        if (!unary_costs_.empty()) {
+            return unary_costs_[node * num_labels_ + label];
+        }
         return unary_cost_fn_ ? unary_cost_fn_(node, label) : 0;
     }
 
     [[nodiscard]] EnergyValue get_pairwise_cost(int node1, int node2, int label1, int label2) const {
+        if (!pairwise_costs_.empty()) {
+            return pairwise_costs_[label1 * num_labels_ + label2];
+        }
         return pairwise_cost_fn_ ? pairwise_cost_fn_(node1, node2, label1, label2) : 0;
+    }
+
+    void set_unary_costs(const std::vector<EnergyValue>& costs) {
+        if (costs.size() != static_cast<size_t>(num_nodes_ * num_labels_)) {
+            throw std::invalid_argument("Unary costs array must have size num_nodes * num_labels");
+        }
+        unary_costs_ = costs;
+    }
+
+    void set_pairwise_costs(const std::vector<EnergyValue>& costs) {
+        if (costs.size() != static_cast<size_t>(num_labels_ * num_labels_)) {
+            throw std::invalid_argument("Pairwise costs array must have size num_labels * num_labels");
+        }
+        pairwise_costs_ = costs;
     }
 
     void add_neighbor(int node1, int node2) {
@@ -78,4 +98,6 @@ private:
     std::vector<std::vector<int>> neighbors_;
     UnaryCostFn unary_cost_fn_;
     PairwiseCostFn pairwise_cost_fn_;
+    std::vector<EnergyValue> unary_costs_;
+    std::vector<EnergyValue> pairwise_costs_;
 };

@@ -33,26 +33,26 @@ def main():
             if y + 1 < height:
                 model.add_neighbor(node, node + width)
 
-    print("Defining Python energy callbacks...")
+    print("Defining and precomputing energy arrays...")
     LAMBDA = 20
     MAX_UNARY_COST = 50
 
-    def unary_cost(node, label):
-        y = node // width
-        x = node % width
-        d = label
+    pairwise_costs = np.full((num_labels, num_labels), LAMBDA, dtype=np.int32)
+    np.fill_diagonal(pairwise_costs, 0)
+    model.set_pairwise_costs(pairwise_costs.flatten().tolist())
 
-        if x - d < 0:
-            return 1000
+    h, w = height, width
+    unary_costs = np.full((h, w, num_labels), 1000, dtype=np.int32)
 
-        sad = int(np.sum(np.abs(left[y, x] - right[y, x - d])))
-        return min(sad, MAX_UNARY_COST)
+    for d in range(num_labels):
+        if d == 0:
+            diff = np.sum(np.abs(left - right), axis=2)
+            unary_costs[:, :, d] = np.minimum(diff, MAX_UNARY_COST)
+        else:
+            diff = np.sum(np.abs(left[:, d:] - right[:, :-d]), axis=2)
+            unary_costs[:, d:, d] = np.minimum(diff, MAX_UNARY_COST)
 
-    def pairwise_cost(n1, n2, l1, l2):
-        return 0 if l1 == l2 else LAMBDA
-
-    model.set_unary_cost_fn(unary_cost)
-    model.set_pairwise_cost_fn(pairwise_cost)
+    model.set_unary_costs(unary_costs.flatten().tolist())
 
     print(f"Initial energy: {model.evaluate_total_energy()}")
 
