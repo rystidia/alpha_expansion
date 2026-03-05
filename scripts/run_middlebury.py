@@ -59,9 +59,17 @@ def main():
     print("Running Alpha Expansion (BKSolver, SequentialStrategy)...")
     opt = ae.AlphaExpansion(model, "bk")
     strategy = ae.SequentialStrategy(20)
-    strategy.execute(opt, model)
+    cycles = strategy.execute(opt, model)
 
+    print(f"Algorithm converged in {cycles} cycles.")
     print(f"Final energy: {model.evaluate_total_energy()}")
+
+    max_label = num_labels - 1
+    gt_disparities = np.clip(gt / 16, 0, max_label).astype(np.int32)
+    gt_labels_list = gt_disparities.flatten().tolist()
+
+    gt_energy = model.evaluate_total_energy_with_labels(gt_labels_list)
+    print(f"Ground Truth energy: {gt_energy}")
 
     labels = np.array(model.get_labels(), dtype=np.uint8).reshape((height, width))
 

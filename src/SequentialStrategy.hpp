@@ -7,7 +7,7 @@ public:
     SequentialStrategy(int max_cycles = 100) : max_cycles_(max_cycles) {
     }
 
-    void execute(AlphaExpansion &optimizer, EnergyModel &model) const {
+    int execute(AlphaExpansion &optimizer, EnergyModel &model) const {
         int num_labels = model.num_labels();
         int cycle = 0;
         bool converged = false;
@@ -25,6 +25,7 @@ public:
             }
             cycle++;
         }
+        return cycle;
     }
 
 private:
