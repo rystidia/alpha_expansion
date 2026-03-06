@@ -40,7 +40,7 @@
 #define __GRAPH_H__
 
 #include <string.h>
-#include "block.h"
+#include "bk_maxflow_impl/block.h"
 
 #include <assert.h>
 // NOTE: in UNIX you need to use -DNDEBUG preprocessor option to supress assert's!!!

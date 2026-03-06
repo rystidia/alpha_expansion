@@ -1,7 +1,7 @@
 #pragma once
 
-#include "MaxFlowSolver.hpp"
-#include "energy.h"
+#include "solvers/MaxFlowSolver.hpp"
+#include "bk_maxflow_impl/energy.h"
 
 // wrapper for the Boykov-Kolmogorov max-flow solver
 class BKSolver : public MaxFlowSolver {

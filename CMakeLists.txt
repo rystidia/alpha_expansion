@@ -10,9 +10,9 @@ endif()
 
 # Core maxflow library
 add_library(graph_cuts STATIC
-    src/graph.cpp
-    src/maxflow.cpp
-    src/instances.cpp
+    src/bk_maxflow_impl/graph.cpp
+    src/bk_maxflow_impl/maxflow.cpp
+    src/bk_maxflow_impl/instances.cpp
 )
 target_include_directories(graph_cuts PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -52,5 +52,5 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pybind11)
 
-pybind11_add_module(alpha_expansion_py src/bindings.cpp)
+pybind11_add_module(alpha_expansion_py src/bindings/bindings.cpp)
 target_link_libraries(alpha_expansion_py PRIVATE graph_cuts ortools::ortools)

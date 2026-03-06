@@ -35,7 +35,7 @@
 	///////////////////////////////////////////////////
 
 	#include <stdio.h>
-	#include "energy.h"
+	#include "bk_maxflow_impl/energy.h"
 
 	void main()
 	{
@@ -74,7 +74,7 @@
 #define __ENERGY_H__
 
 #include <assert.h>
-#include "graph.h"
+#include "bk_maxflow_impl/graph.h"
 
 template <typename captype, typename tcaptype, typename flowtype> class Energy: public Graph<captype,tcaptype,flowtype>
 {

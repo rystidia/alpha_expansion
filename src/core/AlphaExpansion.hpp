@@ -1,7 +1,7 @@
 #pragma once
 
-#include "EnergyModel.hpp"
-#include "MaxFlowSolver.hpp"
+#include "core/EnergyModel.hpp"
+#include "solvers/MaxFlowSolver.hpp"
 #include <memory>
 #include <functional>
 

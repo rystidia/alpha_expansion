@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AlphaExpansion.hpp"
+#include "core/AlphaExpansion.hpp"
 
 class GreedyStrategy {
 public:

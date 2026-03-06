@@ -2,7 +2,7 @@
 
 
 #include <stdio.h>
-#include "graph.h"
+#include "bk_maxflow_impl/graph.h"
 
 
 /*

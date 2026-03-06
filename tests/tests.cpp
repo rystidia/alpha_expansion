@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "BKSolver.hpp"
-#include "ORToolsSolver.hpp"
+#include "solvers/BKSolver.hpp"
+#include "solvers/ORToolsSolver.hpp"
 
 #include <vector>
 #include <memory>

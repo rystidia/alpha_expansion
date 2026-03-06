@@ -3,13 +3,13 @@
 #include <pybind11/functional.h>
 #include <memory>
 
-#include "EnergyModel.hpp"
-#include "AlphaExpansion.hpp"
-#include "SequentialStrategy.hpp"
-#include "GreedyStrategy.hpp"
-#include "RandomizedStrategy.hpp"
-#include "BKSolver.hpp"
-#include "ORToolsSolver.hpp"
+#include "core/EnergyModel.hpp"
+#include "core/AlphaExpansion.hpp"
+#include "strategies/SequentialStrategy.hpp"
+#include "strategies/GreedyStrategy.hpp"
+#include "strategies/RandomizedStrategy.hpp"
+#include "solvers/BKSolver.hpp"
+#include "solvers/ORToolsSolver.hpp"
 
 namespace py = pybind11;
 

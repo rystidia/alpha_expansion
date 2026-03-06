@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MaxFlowSolver.hpp"
+#include "solvers/MaxFlowSolver.hpp"
 #include "ortools/graph/max_flow.h"
 #include <vector>
 #include <cassert>
