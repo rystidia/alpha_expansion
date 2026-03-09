@@ -87,12 +87,16 @@ def main():
         "Valjean": 0,
         "Cosette": 0,
         "Marius": 0,
+        "Fauchelevent": 0,
         "Javert": 1,
+        "Enjolras": 1,
         "Gavroche": 1,
+        "Combeferre": 1,
         "Thenardier": 2,
         "MmeThenardier": 2,
+        "Boulatruelle": 2,
     }
-    run_community_detection(G_lesmis, "Les Misérables", lesmis_seeds, lambda_val=5)
+    run_community_detection(G_lesmis, "Les Misérables", lesmis_seeds, lambda_val=8)
 
 
 if __name__ == "__main__":
