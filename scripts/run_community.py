@@ -52,8 +52,8 @@ def main():
     print(f"Final Energy: {final_energy}")
 
     labels = model.get_labels()
-    mr_hi_faction = [n for n, l in enumerate(labels) if l == 0]
-    officer_faction = [n for n, l in enumerate(labels) if l == 1]
+    mr_hi_faction = [n for n, label in enumerate(labels) if label == 0]
+    officer_faction = [n for n, label in enumerate(labels) if label == 1]
 
     print("\nFinal Split")
     print(
