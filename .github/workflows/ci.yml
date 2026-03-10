@@ -1,0 +1,115 @@
+name: C++ CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-cpp:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up latest CMake
+      uses: jwlawson/actions-setup-cmake@v2.0
+      with:
+        cmake-version: '3.25.x'
+
+    - name: Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y zlib1g-dev libssl-dev libbz2-dev wget
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Download Precompiled OR-Tools
+      run: |
+        wget -qO ortools.tar.gz https://github.com/google/or-tools/releases/download/v9.15/or-tools_amd64_ubuntu-24.04_cpp_v9.15.6755.tar.gz
+        tar -xzf ortools.tar.gz
+        mv or-tools_x86_64_Ubuntu-24.04_cpp_v9.15.6755 ortools-lib
+
+    - name: Configure CMake
+      run: >
+        cmake -B build
+        -DCMAKE_BUILD_TYPE=Release
+        -DFETCHCONTENT_QUIET=OFF
+        -DCMAKE_PREFIX_PATH=${GITHUB_WORKSPACE}/ortools-lib
+        -Dortools_DIR=${GITHUB_WORKSPACE}/ortools-lib/lib/cmake/ortools
+
+    - name: Build Library and Bindings
+      run: cmake --build build --config Release -j 4
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: compiled-build
+        path: build/
+        retention-days: 1
+
+  test-cpp:
+    needs: build-cpp
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: compiled-build
+        path: build/
+
+    - name: Download Precompiled OR-Tools
+      run: |
+        wget -qO ortools.tar.gz https://github.com/google/or-tools/releases/download/v9.15/or-tools_amd64_ubuntu-24.04_cpp_v9.15.6755.tar.gz
+        tar -xzf ortools.tar.gz
+        mv or-tools_x86_64_Ubuntu-24.04_cpp_v9.15.6755 ortools-lib
+
+    - name: Run C++ GoogleTests
+      run: |
+        export LD_LIBRARY_PATH=$GITHUB_WORKSPACE/ortools-lib/lib:$LD_LIBRARY_PATH
+        chmod +x build/alpha_expansion_tests
+        ./build/alpha_expansion_tests
+
+  test-python:
+    needs: build-cpp
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+
+    - name: Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: compiled-build
+        path: build/
+
+    - name: Download Precompiled OR-Tools
+      run: |
+        wget -qO ortools.tar.gz https://github.com/google/or-tools/releases/download/v9.15/or-tools_amd64_ubuntu-24.04_cpp_v9.15.6755.tar.gz
+        tar -xzf ortools.tar.gz
+        mv or-tools_x86_64_Ubuntu-24.04_cpp_v9.15.6755 ortools-lib
+
+    - name: Run Python Community Detection Script
+      run: |
+        export LD_LIBRARY_PATH=$GITHUB_WORKSPACE/ortools-lib/lib:$LD_LIBRARY_PATH
+        cd scripts
+        python run_community.py --solver bk --strategy sequential
+      
+    - name: Verify OR-Tools Python execution
+      run: |
+        export LD_LIBRARY_PATH=$GITHUB_WORKSPACE/ortools-lib/lib:$LD_LIBRARY_PATH
+        cd scripts
+        python run_community.py --solver ortools --strategy sequential
