@@ -1,13 +1,16 @@
 import sys
 import os
 import networkx as nx
+import argparse
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build")))
 
 import alpha_expansion_py as ae
 
 
-def run_community_detection(G, name, labels_dict, lambda_val=10, ground_truth=None):
+def run_community_detection(
+    G, name, labels_dict, args, lambda_val=10, ground_truth=None
+):
     print(f"\n{'=' * 50}")
     print(f"Loading {name} graph")
 
@@ -38,9 +41,18 @@ def run_community_detection(G, name, labels_dict, lambda_val=10, ground_truth=No
 
     print(f"\nInitial energy: {model.evaluate_total_energy()}")
 
-    print("Running Alpha Expansion (BKSolver, SequentialStrategy)")
-    opt = ae.AlphaExpansion(model, "bk")
-    strategy = ae.SequentialStrategy(10)
+    print(f"Running Alpha Expansion ({args.solver} solver, {args.strategy} strategy)")
+    opt = ae.AlphaExpansion(model, args.solver)
+
+    if args.strategy == "sequential":
+        strategy = ae.SequentialStrategy(args.max_cycles)
+    elif args.strategy == "greedy":
+        strategy = ae.GreedyStrategy(args.max_cycles)
+    elif args.strategy == "randomized":
+        strategy = ae.RandomizedStrategy(args.max_cycles)
+    else:
+        raise ValueError(f"Unknown strategy: {args.strategy}")
+
     cycles = strategy.execute(opt, model)
 
     final_energy = model.evaluate_total_energy()
@@ -68,6 +80,28 @@ def run_community_detection(G, name, labels_dict, lambda_val=10, ground_truth=No
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description="Community Detection using Alpha Expansion"
+    )
+    parser.add_argument(
+        "--solver",
+        type=str,
+        choices=["bk", "ortools"],
+        default="bk",
+        help="MaxFlow solver to use",
+    )
+    parser.add_argument(
+        "--strategy",
+        type=str,
+        choices=["sequential", "greedy", "randomized"],
+        default="sequential",
+        help="Alpha Expansion strategy",
+    )
+    parser.add_argument(
+        "--max_cycles", type=int, default=100, help="Maximum number of expansion cycles"
+    )
+    args = parser.parse_args()
+
     G_karate = nx.karate_club_graph()
     karate_seeds = {0: 0, 33: 1}
 
@@ -78,6 +112,7 @@ def main():
         G_karate,
         "Zachary's Karate Club",
         karate_seeds,
+        args,
         lambda_val=10,
         ground_truth=karate_gt,
     )
@@ -96,7 +131,9 @@ def main():
         "MmeThenardier": 2,
         "Boulatruelle": 2,
     }
-    run_community_detection(G_lesmis, "Les Misérables", lesmis_seeds, lambda_val=8)
+    run_community_detection(
+        G_lesmis, "Les Misérables", lesmis_seeds, args, lambda_val=8
+    )
 
 
 if __name__ == "__main__":

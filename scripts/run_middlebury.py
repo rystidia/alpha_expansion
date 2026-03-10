@@ -1,6 +1,7 @@
 import sys
 import os
 import numpy as np
+import argparse
 from PIL import Image
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build")))
@@ -10,6 +11,28 @@ from load_dataset import load_tsukuba
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description="Image Segmentation using Alpha Expansion on Middlebury Dataset"
+    )
+    parser.add_argument(
+        "--solver",
+        type=str,
+        choices=["bk", "ortools"],
+        default="bk",
+        help="MaxFlow solver to use",
+    )
+    parser.add_argument(
+        "--strategy",
+        type=str,
+        choices=["sequential", "greedy", "randomized"],
+        default="sequential",
+        help="Alpha Expansion strategy",
+    )
+    parser.add_argument(
+        "--max_cycles", type=int, default=100, help="Maximum number of expansion cycles"
+    )
+    args = parser.parse_args()
+
     left, right, gt = load_tsukuba()
 
     height, width, channels = left.shape
@@ -56,9 +79,18 @@ def main():
 
     print(f"Initial energy: {model.evaluate_total_energy()}")
 
-    print("Running Alpha Expansion (BKSolver, SequentialStrategy)...")
-    opt = ae.AlphaExpansion(model, "bk")
-    strategy = ae.SequentialStrategy(20)
+    print(f"Running Alpha Expansion ({args.solver} solver, {args.strategy} strategy)")
+    opt = ae.AlphaExpansion(model, args.solver)
+
+    if args.strategy == "sequential":
+        strategy = ae.SequentialStrategy(args.max_cycles)
+    elif args.strategy == "greedy":
+        strategy = ae.GreedyStrategy(args.max_cycles)
+    elif args.strategy == "randomized":
+        strategy = ae.RandomizedStrategy(args.max_cycles)
+    else:
+        raise ValueError(f"Unknown strategy: {args.strategy}")
+
     cycles = strategy.execute(opt, model)
 
     print(f"Algorithm converged in {cycles} cycles.")
