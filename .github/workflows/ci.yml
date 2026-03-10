@@ -20,11 +20,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y zlib1g-dev libssl-dev libbz2-dev wget
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-
     - name: Download Precompiled OR-Tools
       run: |
         wget -qO ortools.tar.gz https://github.com/google/or-tools/releases/download/v9.15/or-tools_amd64_ubuntu-24.04_cpp_v9.15.6755.tar.gz
@@ -46,7 +41,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: compiled-build
-        path: build/
+        path: |
+          build/
+          ortools-lib/
         retention-days: 1
 
   test-cpp:
@@ -59,17 +56,9 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: compiled-build
-        path: build/
-
-    - name: Download Precompiled OR-Tools
-      run: |
-        wget -qO ortools.tar.gz https://github.com/google/or-tools/releases/download/v9.15/or-tools_amd64_ubuntu-24.04_cpp_v9.15.6755.tar.gz
-        tar -xzf ortools.tar.gz
-        mv or-tools_x86_64_Ubuntu-24.04_cpp_v9.15.6755 ortools-lib
 
     - name: Run C++ GoogleTests
       run: |
-        export LD_LIBRARY_PATH=$GITHUB_WORKSPACE/ortools-lib/lib:$LD_LIBRARY_PATH
         chmod +x build/alpha_expansion_tests
         ./build/alpha_expansion_tests
 
@@ -94,22 +83,13 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: compiled-build
-        path: build/
-
-    - name: Download Precompiled OR-Tools
-      run: |
-        wget -qO ortools.tar.gz https://github.com/google/or-tools/releases/download/v9.15/or-tools_amd64_ubuntu-24.04_cpp_v9.15.6755.tar.gz
-        tar -xzf ortools.tar.gz
-        mv or-tools_x86_64_Ubuntu-24.04_cpp_v9.15.6755 ortools-lib
 
     - name: Run Python Community Detection Script
       run: |
-        export LD_LIBRARY_PATH=$GITHUB_WORKSPACE/ortools-lib/lib:$LD_LIBRARY_PATH
         cd scripts
         python run_community.py --solver bk --strategy sequential
       
     - name: Verify OR-Tools Python execution
       run: |
-        export LD_LIBRARY_PATH=$GITHUB_WORKSPACE/ortools-lib/lib:$LD_LIBRARY_PATH
         cd scripts
         python run_community.py --solver ortools --strategy sequential
