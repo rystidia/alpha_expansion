@@ -4,8 +4,9 @@
 #include "bk_maxflow_impl/energy.h"
 
 // wrapper for the Boykov-Kolmogorov max-flow solver
-class BKSolver : public MaxFlowSolver {
-    typedef Energy<int, int, int> EnergyT;
+template <typename T>
+class BKSolver : public MaxFlowSolver<T> {
+    typedef Energy<T, T, T> EnergyT;
     EnergyT* e;
 
 public:
@@ -17,27 +18,27 @@ public:
         delete e;
     }
 
-    Var add_variable() override {
+    typename MaxFlowSolver<T>::Var add_variable() override {
         return e->add_variable();
     }
 
-    void add_constant(EnergyValue E) override {
+    void add_constant(T E) override {
         e->add_constant(E);
     }
 
-    void add_term1(Var x, EnergyValue E0, EnergyValue E1) override {
+    void add_term1(typename MaxFlowSolver<T>::Var x, T E0, T E1) override {
         e->add_term1(x, E0, E1);
     }
 
-    void add_term2(Var x, Var y, EnergyValue E00, EnergyValue E01, EnergyValue E10, EnergyValue E11) override {
+    void add_term2(typename MaxFlowSolver<T>::Var x, typename MaxFlowSolver<T>::Var y, T E00, T E01, T E10, T E11) override {
         e->add_term2(x, y, E00, E01, E10, E11);
     }
 
-    EnergyValue minimize() override {
+    T minimize() override {
         return e->minimize();
     }
 
-    int get_var(Var x) override {
+    int get_var(typename MaxFlowSolver<T>::Var x) override {
         return e->get_var(x);
     }
 };

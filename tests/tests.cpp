@@ -6,15 +6,15 @@
 #include <memory>
 #include <tuple>
 
-class EnergyMinimizationTest : public ::testing::TestWithParam<std::function<MaxFlowSolver*(int, int)> > {
+class EnergyMinimizationTest : public ::testing::TestWithParam<std::function<MaxFlowSolver<int>*(int, int)> > {
 protected:
-    static MaxFlowSolver *create_solver(const int vars, const int edges) {
+    static MaxFlowSolver<int> *create_solver(const int vars, const int edges) {
         return GetParam()(vars, edges);
     }
 };
 
 TEST_P(EnergyMinimizationTest, BasicSubmodularEnergy) {
-    const auto e = std::unique_ptr<MaxFlowSolver>(create_solver(3, 5));
+    const auto e = std::unique_ptr<MaxFlowSolver<int>>(create_solver(3, 5));
     const auto varx = e->add_variable();
     const auto vary = e->add_variable();
     const auto varz = e->add_variable();
@@ -32,8 +32,8 @@ TEST_P(EnergyMinimizationTest, BasicSubmodularEnergy) {
 }
 
 TEST_P(EnergyMinimizationTest, IndependentVariables) {
-    const auto e = std::unique_ptr<MaxFlowSolver>(create_solver(5, 0));
-    std::vector<MaxFlowSolver::Var> vars;
+    const auto e = std::unique_ptr<MaxFlowSolver<int>>(create_solver(5, 0));
+    std::vector<MaxFlowSolver<int>::Var> vars;
     for (int i = 0; i < 5; ++i) {
         vars.push_back(e->add_variable());
     }
@@ -52,7 +52,7 @@ TEST_P(EnergyMinimizationTest, IndependentVariables) {
 }
 
 TEST_P(EnergyMinimizationTest, AttractivePotentials) {
-    const auto e = std::unique_ptr<MaxFlowSolver>(create_solver(2, 1));
+    const auto e = std::unique_ptr<MaxFlowSolver<int>>(create_solver(2, 1));
     const auto x = e->add_variable();
     const auto y = e->add_variable();
 
@@ -67,8 +67,8 @@ TEST_P(EnergyMinimizationTest, AttractivePotentials) {
 
 TEST_P(EnergyMinimizationTest, 1DChainMRF) {
     const int N = 10;
-    auto e = std::unique_ptr<MaxFlowSolver>(create_solver(N, N - 1));
-    std::vector<MaxFlowSolver::Var> vars(N);
+    auto e = std::unique_ptr<MaxFlowSolver<int>>(create_solver(N, N - 1));
+    std::vector<MaxFlowSolver<int>::Var> vars(N);
     for (int i = 0; i < N; ++i) vars[i] = e->add_variable();
 
     e->add_term1(vars[0], 1000, 0);
@@ -86,8 +86,8 @@ TEST_P(EnergyMinimizationTest, 1DChainMRF) {
 TEST_P(EnergyMinimizationTest, 2DGridMRF) {
     const int W = 3;
     const int H = 3;
-    auto e = std::unique_ptr<MaxFlowSolver>(create_solver(W * H, 4 * W * H));
-    std::vector<MaxFlowSolver::Var> vars(W * H);
+    auto e = std::unique_ptr<MaxFlowSolver<int>>(create_solver(W * H, 4 * W * H));
+    std::vector<MaxFlowSolver<int>::Var> vars(W * H);
     for (int i = 0; i < W * H; ++i) vars[i] = e->add_variable();
 
     e->add_term1(vars[0], 100, 0);
@@ -108,7 +108,7 @@ INSTANTIATE_TEST_SUITE_P(
     MaxFlowSolvers,
     EnergyMinimizationTest,
     ::testing::Values(
-        [](int v, int e) -> MaxFlowSolver* { return new BKSolver(v, e); },
-        [](int v, int e) -> MaxFlowSolver* { return new ORToolsSolver(); }
+        [](int v, int e) -> MaxFlowSolver<int>* { return new BKSolver<int>(v, e); },
+        [](int v, int e) -> MaxFlowSolver<int>* { return new ORToolsSolver<int>(); }
     )
 );

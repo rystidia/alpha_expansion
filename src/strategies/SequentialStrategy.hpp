@@ -2,12 +2,13 @@
 
 #include "core/AlphaExpansion.hpp"
 
+template <typename T>
 class SequentialStrategy {
 public:
     SequentialStrategy(int max_cycles = 100) : max_cycles_(max_cycles) {
     }
 
-    int execute(AlphaExpansion &optimizer, EnergyModel &model) const {
+    int execute(AlphaExpansion<T> &optimizer, EnergyModel<T> &model) const {
         int num_labels = model.num_labels();
         int cycle = 0;
         bool converged = false;

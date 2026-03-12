@@ -12,19 +12,19 @@
 #include <tuple>
 #include <functional>
 
-using SolverParam = std::function<MaxFlowSolver*(int, int)>;
-using StrategyParam = std::function<void(AlphaExpansion &, EnergyModel &)>;
+using SolverParam = std::function<MaxFlowSolver<int>*(int, int)>;
+using StrategyParam = std::function<void(AlphaExpansion<int> &, EnergyModel<int> &)>;
 using TestParams = std::tuple<SolverParam, StrategyParam>;
 
 class AlphaExpansionTest : public testing::TestWithParam<TestParams> {
 protected:
-    static AlphaExpansion::SolverFactory get_factory() {
-        return [](const int v, const int e) {
-            return std::unique_ptr<MaxFlowSolver>(std::get<0>(GetParam())(v, e));
+    static AlphaExpansion<int>::SolverFactory get_factory() {
+        return [](const int v, const int e) -> std::unique_ptr<MaxFlowSolver<int>> {
+            return std::unique_ptr<MaxFlowSolver<int>>(std::get<0>(GetParam())(v, e));
         };
     }
 
-    static void execute_strategy(AlphaExpansion &optimizer, EnergyModel &model) {
+    static void execute_strategy(AlphaExpansion<int> &optimizer, EnergyModel<int> &model) {
         std::get<1>(GetParam())(optimizer, model);
     }
 };
@@ -32,14 +32,14 @@ protected:
 TEST_P(AlphaExpansionTest, Test2DGridDenosingMRF) {
     const int W = 5;
     const int H = 5;
-    EnergyModel model(W * H, 3);
+    EnergyModel<int> model(W * H, 3);
 
-    std::vector noisy_image(W * H, 0);
+    std::vector<int> noisy_image(W * H, 0);
     for (int i = 0; i < W * H; ++i) noisy_image[i] = i % 3;
 
     for (int i = 0; i < W * H; ++i) model.set_label(i, noisy_image[i]);
 
-    model.set_unary_cost_fn([&](int node, int label) -> EnergyValue {
+    model.set_unary_cost_fn([&](int node, int label) -> int {
         int x = node % W;
         int y = node / W;
         int preferred_label = 0;
@@ -48,7 +48,7 @@ TEST_P(AlphaExpansionTest, Test2DGridDenosingMRF) {
         return label == preferred_label ? 0 : 100;
     });
 
-    model.set_pairwise_cost_fn([&](int n1, int n2, int l1, int l2) -> EnergyValue {
+    model.set_pairwise_cost_fn([&](int n1, int n2, int l1, int l2) -> int {
         return l1 == l2 ? 0 : 20;
     });
 
@@ -60,12 +60,12 @@ TEST_P(AlphaExpansionTest, Test2DGridDenosingMRF) {
         }
     }
 
-    AlphaExpansion optimizer(model, get_factory());
+    AlphaExpansion<int> optimizer(model, get_factory());
 
-    EnergyValue start_energy = model.evaluate_total_energy();
+    int start_energy = model.evaluate_total_energy();
     execute_strategy(optimizer, model);
 
-    EnergyValue final_energy = model.evaluate_total_energy();
+    int final_energy = model.evaluate_total_energy();
 
     EXPECT_LT(final_energy, start_energy);
 
@@ -77,26 +77,26 @@ TEST_P(AlphaExpansionTest, TwoPixelTrap_StartsAt_0_0) {
     const int n = 2;
     const int k = 3;
     const int m = 1;
-    EnergyModel model(n, k);
+    EnergyModel<int> model(n, k);
 
     // Starting with (0,0) configuration (local minimum trap)
     model.set_label(0, 0);
     model.set_label(1, 0);
 
-    model.set_unary_cost_fn([&](int node, int label) -> EnergyValue {
+    model.set_unary_cost_fn([&](int node, int label) -> int {
         if (node == 0) return (label == 0) ? 1 : (label == 1) ? 3 : 0;
         if (node == 1) return (label == 0) ? 1 : (label == 1) ? 0 : 3;
         return 0;
     });
 
-    model.set_pairwise_cost_fn([&](int n1, int n2, int l1, int l2) -> EnergyValue {
+    model.set_pairwise_cost_fn([&](int n1, int n2, int l1, int l2) -> int {
         return (l1 == l2) ? 0 : m;
     });
 
     model.add_neighbor(0, 1);
 
     auto factory = get_factory();
-    AlphaExpansion optimizer(model, factory);
+    AlphaExpansion<int> optimizer(model, factory);
     execute_strategy(optimizer, model);
 
     EXPECT_EQ(model.evaluate_total_energy(), 2);
@@ -106,26 +106,26 @@ TEST_P(AlphaExpansionTest, TwoPixelTrap_StartsAt_0_1) {
     const int n = 2;
     const int k = 3;
     const int m = 1;
-    EnergyModel model(n, k);
+    EnergyModel<int> model(n, k);
 
     // Starting with (0,1) configuration (must reach optimal E=1)
     model.set_label(0, 0);
     model.set_label(1, 1);
 
-    model.set_unary_cost_fn([&](int node, int label) -> EnergyValue {
+    model.set_unary_cost_fn([&](int node, int label) -> int {
         if (node == 0) return (label == 0) ? 1 : (label == 1) ? 3 : 0;
         if (node == 1) return (label == 0) ? 1 : (label == 1) ? 0 : 3;
         return 0;
     });
 
-    model.set_pairwise_cost_fn([&](int n1, int n2, int l1, int l2) -> EnergyValue {
+    model.set_pairwise_cost_fn([&](int n1, int n2, int l1, int l2) -> int {
         return (l1 == l2) ? 0 : m;
     });
 
     model.add_neighbor(0, 1);
 
     auto factory = get_factory();
-    AlphaExpansion optimizer(model, factory);
+    AlphaExpansion<int> optimizer(model, factory);
     execute_strategy(optimizer, model);
 
     EXPECT_EQ(model.evaluate_total_energy(), 1);
@@ -137,18 +137,18 @@ TEST_P(AlphaExpansionTest, TestManyCycles2) {
     const int b = 7;
     const int m = 2;
     const int k = 3;
-    EnergyModel model(n, k);
+    EnergyModel<int> model(n, k);
 
     for (int i = 0; i < n; ++i) model.set_label(i, 0);
 
-    model.set_unary_cost_fn([&](int node, int label) -> EnergyValue {
+    model.set_unary_cost_fn([&](int node, int label) -> int {
         if (node % 2 == 0) {
             return (label == 0) ? a : (label == 1) ? 0 : b;
         }
         return (label == 0) ? a : (label == 1) ? b : 0;
     });
 
-    model.set_pairwise_cost_fn([&](int n1, int n2, int l1, int l2) -> EnergyValue {
+    model.set_pairwise_cost_fn([&](int n1, int n2, int l1, int l2) -> int {
         return (l1 == l2) ? 0 : m;
     });
 
@@ -156,12 +156,10 @@ TEST_P(AlphaExpansionTest, TestManyCycles2) {
         model.add_neighbor(i, i + 1);
     }
 
-    AlphaExpansion optimizer(model, get_factory());
+    AlphaExpansion<int> optimizer(model, get_factory());
     execute_strategy(optimizer, model);
 
-    EnergyValue final_energy = model.evaluate_total_energy();
-    // optimal is alternating 1 and 2 with unary = 0.
-    // smooth = (n-1) * m
+    int final_energy = model.evaluate_total_energy();
     EXPECT_EQ(final_energy, (n - 1) * m);
 }
 
@@ -170,7 +168,7 @@ TEST_P(AlphaExpansionTest, TestSnakeMRF) {
     const int h = 16;
     const int num_labels = 3;
     const int num_pixels = w * h;
-    EnergyModel model(num_pixels, num_labels);
+    EnergyModel<int> model(num_pixels, num_labels);
 
     for (int i = 0; i < num_pixels; ++i) model.set_label(i, 0);
 
@@ -181,8 +179,8 @@ TEST_P(AlphaExpansionTest, TestSnakeMRF) {
         x = row % 2 == 0 ? col : w - 1 - col;
     };
 
-    std::vector unary_1(num_pixels, 0);
-    std::vector unary_2(num_pixels, 0);
+    std::vector<int> unary_1(num_pixels, 0);
+    std::vector<int> unary_2(num_pixels, 0);
 
     for (int i = 0; i < num_pixels; ++i) {
         int x, y;
@@ -197,16 +195,16 @@ TEST_P(AlphaExpansionTest, TestSnakeMRF) {
         }
     }
 
-    model.set_unary_cost_fn([&](int node, int label) -> EnergyValue {
+    model.set_unary_cost_fn([&](int node, int label) -> int {
         if (label == 0) return 3;
         if (label == 1) return unary_1[node];
         return unary_2[node];
     });
 
-    const EnergyValue h_path = 2;
+    const int h_path = 2;
 
-    std::vector hWeights(num_pixels, 0);
-    std::vector vWeights(num_pixels, 0);
+    std::vector<int> hWeights(num_pixels, 0);
+    std::vector<int> vWeights(num_pixels, 0);
 
     for (int i = 0; i < num_pixels - 1; ++i) {
         int x1, y1, x2, y2;
@@ -222,14 +220,14 @@ TEST_P(AlphaExpansionTest, TestSnakeMRF) {
         }
     }
 
-    model.set_pairwise_cost_fn([&](int n1, int n2, int l1, int l2) -> EnergyValue {
+    model.set_pairwise_cost_fn([&](int n1, int n2, int l1, int l2) -> int {
         if (l1 == l2) return 0;
         int x1 = n1 % w;
         int y1 = n1 / w;
         int x2 = n2 % w;
         int y2 = n2 / w;
 
-        EnergyValue weight = 0;
+        int weight = 0;
         if (y1 == y2) {
             int left = std::min(x1, x2);
             weight = hWeights[y1 * w + left];
@@ -248,10 +246,10 @@ TEST_P(AlphaExpansionTest, TestSnakeMRF) {
         }
     }
 
-    AlphaExpansion optimizer(model, get_factory());
+    AlphaExpansion<int> optimizer(model, get_factory());
     execute_strategy(optimizer, model);
 
-    EnergyValue final_energy = model.evaluate_total_energy();
+    int final_energy = model.evaluate_total_energy();
     EXPECT_EQ(final_energy, 510);
 }
 
@@ -260,13 +258,13 @@ INSTANTIATE_TEST_SUITE_P(
     AlphaExpansionTest,
     ::testing::Combine(
         ::testing::Values(
-            [](int v, int e) -> MaxFlowSolver* { return new BKSolver(v, e); },
-            [](int v, int e) -> MaxFlowSolver* { return new ORToolsSolver(); }
+            [](int v, int e) -> MaxFlowSolver<int>* { return new BKSolver<int>(v, e); },
+            [](int v, int e) -> MaxFlowSolver<int>* { return new ORToolsSolver<int>(); }
         ),
         ::testing::Values(
-            [](AlphaExpansion& opt, EnergyModel& mod) { SequentialStrategy s; s.execute(opt, mod); },
-            [](AlphaExpansion& opt, EnergyModel& mod) { GreedyStrategy s(1000); s.execute(opt, mod); },
-            [](AlphaExpansion& opt, EnergyModel& mod) { RandomizedStrategy s(100, 42); s.execute(opt, mod); }
+            [](AlphaExpansion<int>& opt, EnergyModel<int>& mod) { SequentialStrategy<int> s; s.execute(opt, mod); },
+            [](AlphaExpansion<int>& opt, EnergyModel<int>& mod) { GreedyStrategy<int> s(1000); s.execute(opt, mod); },
+            [](AlphaExpansion<int>& opt, EnergyModel<int>& mod) { RandomizedStrategy<int> s(100, 42); s.execute(opt, mod); }
         )
     )
 );

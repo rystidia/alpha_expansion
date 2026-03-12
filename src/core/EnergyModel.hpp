@@ -4,12 +4,11 @@
 #include <functional>
 #include <cstdint>
 
-typedef int32_t EnergyValue;
-
+template <typename T>
 class EnergyModel {
 public:
-    using UnaryCostFn = std::function<EnergyValue(int node, int label)>;
-    using PairwiseCostFn = std::function<EnergyValue(int node1, int node2, int label1, int label2)>;
+    using UnaryCostFn = std::function<T(int node, int label)>;
+    using PairwiseCostFn = std::function<T(int node1, int node2, int label1, int label2)>;
 
     EnergyModel(int num_nodes, int num_labels)
         : num_nodes_(num_nodes), num_labels_(num_labels), labels_(num_nodes, 0), neighbors_(num_nodes) {}
@@ -25,28 +24,28 @@ public:
     void set_unary_cost_fn(UnaryCostFn fn) { unary_cost_fn_ = fn; }
     void set_pairwise_cost_fn(PairwiseCostFn fn) { pairwise_cost_fn_ = fn; }
 
-    [[nodiscard]] EnergyValue get_unary_cost(int node, int label) const {
+    [[nodiscard]] T get_unary_cost(int node, int label) const {
         if (!unary_costs_.empty()) {
             return unary_costs_[node * num_labels_ + label];
         }
         return unary_cost_fn_ ? unary_cost_fn_(node, label) : 0;
     }
 
-    [[nodiscard]] EnergyValue get_pairwise_cost(int node1, int node2, int label1, int label2) const {
+    [[nodiscard]] T get_pairwise_cost(int node1, int node2, int label1, int label2) const {
         if (!pairwise_costs_.empty()) {
             return pairwise_costs_[label1 * num_labels_ + label2];
         }
         return pairwise_cost_fn_ ? pairwise_cost_fn_(node1, node2, label1, label2) : 0;
     }
 
-    void set_unary_costs(const std::vector<EnergyValue>& costs) {
+    void set_unary_costs(const std::vector<T>& costs) {
         if (costs.size() != static_cast<size_t>(num_nodes_ * num_labels_)) {
             throw std::invalid_argument("Unary costs array must have size num_nodes * num_labels");
         }
         unary_costs_ = costs;
     }
 
-    void set_pairwise_costs(const std::vector<EnergyValue>& costs) {
+    void set_pairwise_costs(const std::vector<T>& costs) {
         if (costs.size() != static_cast<size_t>(num_labels_ * num_labels_)) {
             throw std::invalid_argument("Pairwise costs array must have size num_labels * num_labels");
         }
@@ -74,8 +73,8 @@ public:
         return active_nodes;
     }
 
-    [[nodiscard]] EnergyValue evaluate_total_energy(const std::vector<int> &eval_labels) const {
-        EnergyValue total = 0;
+    [[nodiscard]] T evaluate_total_energy(const std::vector<int> &eval_labels) const {
+        T total = 0;
         for (int i = 0; i < num_nodes_; ++i) {
             total += get_unary_cost(i, eval_labels[i]);
             for (int neighbor : neighbors_[i]) {
@@ -87,7 +86,7 @@ public:
         return total;
     }
 
-    [[nodiscard]] EnergyValue evaluate_total_energy() const {
+    [[nodiscard]] T evaluate_total_energy() const {
         return evaluate_total_energy(labels_);
     }
 
@@ -98,6 +97,6 @@ private:
     std::vector<std::vector<int>> neighbors_;
     UnaryCostFn unary_cost_fn_;
     PairwiseCostFn pairwise_cost_fn_;
-    std::vector<EnergyValue> unary_costs_;
-    std::vector<EnergyValue> pairwise_costs_;
+    std::vector<T> unary_costs_;
+    std::vector<T> pairwise_costs_;
 };

@@ -45,7 +45,7 @@ def main():
 
     num_labels = 16
     print(f"Number of labels (disparities): {num_labels}")
-    model = ae.EnergyModel(num_nodes, num_labels)
+    model = ae.EnergyModel(num_nodes, num_labels, "int32")
 
     print("Adding 4-connected grid neighbors...")
     for y in range(height):
@@ -80,14 +80,14 @@ def main():
     print(f"Initial energy: {model.evaluate_total_energy()}")
 
     print(f"Running Alpha Expansion ({args.solver} solver, {args.strategy} strategy)")
-    opt = ae.AlphaExpansion(model, args.solver)
+    opt = ae.AlphaExpansionInt(model, args.solver)
 
     if args.strategy == "sequential":
-        strategy = ae.SequentialStrategy(args.max_cycles)
+        strategy = ae.SequentialStrategyInt(args.max_cycles)
     elif args.strategy == "greedy":
-        strategy = ae.GreedyStrategy(args.max_cycles)
+        strategy = ae.GreedyStrategyInt(args.max_cycles)
     elif args.strategy == "randomized":
-        strategy = ae.RandomizedStrategy(args.max_cycles)
+        strategy = ae.RandomizedStrategyInt(args.max_cycles)
     else:
         raise ValueError(f"Unknown strategy: {args.strategy}")
 
