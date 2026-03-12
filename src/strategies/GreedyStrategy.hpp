@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/AlphaExpansion.hpp"
+#include <type_traits>
 
 template <typename T>
 class GreedyStrategy {
@@ -24,7 +25,13 @@ public:
 
                 if (optimizer.perform_expansion_move(alpha)) {
                     T new_energy = model.evaluate_total_energy();
-                    if (new_energy < best_energy) {
+                    bool improved = false;
+                    if constexpr (std::is_floating_point_v<T>) {
+                        improved = (best_energy - new_energy > static_cast<T>(1e-5));
+                    } else {
+                        improved = (new_energy < best_energy);
+                    }
+                    if (improved) {
                         best_energy = new_energy;
                         best_alpha = alpha;
                         best_labels = model.get_labels();

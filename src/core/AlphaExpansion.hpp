@@ -4,6 +4,7 @@
 #include "solvers/MaxFlowSolver.hpp"
 #include <memory>
 #include <functional>
+#include <type_traits>
 
 template <typename T>
 class AlphaExpansion {
@@ -86,7 +87,13 @@ public:
         if (changed) {
             T old_energy = model_.evaluate_total_energy();
             T new_energy = model_.evaluate_total_energy(proposed_labels);
-            if (new_energy < old_energy) {
+            bool improved = false;
+            if constexpr (std::is_floating_point_v<T>) {
+                improved = (old_energy - new_energy > static_cast<T>(1e-5));
+            } else {
+                improved = (new_energy < old_energy);
+            }
+            if (improved) {
                 model_.set_labels(proposed_labels);
                 return true;
             }
