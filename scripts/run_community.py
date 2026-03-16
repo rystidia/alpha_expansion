@@ -2,6 +2,8 @@ import sys
 import os
 import networkx as nx
 import argparse
+import matplotlib.colors as mcolors
+import matplotlib.pyplot as plt
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build")))
 
@@ -9,7 +11,7 @@ import alpha_expansion_py as ae
 
 
 def run_community_detection(
-    G, name, labels_dict, args, lambda_val=10, ground_truth=None
+    G, name, labels_dict, args, lambda_val=10, ground_truth=None, visualize=False
 ):
     print(f"\n{'=' * 50}")
     print(f"Loading {name} graph")
@@ -78,6 +80,53 @@ def run_community_detection(
             f"\nGround Truth Label Accuracy: {match_count}/{num_nodes} ({(match_count / num_nodes) * 100:.1f}%)"
         )
 
+    if visualize:
+        plt.figure(figsize=(12, 10))
+        try:
+            from networkx.drawing.nx_pydot import graphviz_layout
+            pos = graphviz_layout(G, prog="neato")
+        except ImportError:
+            print("Warning: nx_pydot or pydot not found, falling back to spring_layout")
+            pos = nx.spring_layout(G, seed=42)
+        except Exception as e:
+            print(f"Warning: Graphviz layout failed ({e}), falling back to spring_layout")
+            pos = nx.spring_layout(G, seed=42)
+
+        color_palette = list(mcolors.TABLEAU_COLORS.values())
+        node_colors = [color_palette[labels[i] % len(color_palette)] for i in range(num_nodes)]
+        
+        edge_colors = ['#CCCCCC'] * num_nodes
+        edge_widths = [1.0] * num_nodes
+        if ground_truth:
+            for i, node in enumerate(G.nodes()):
+                if labels[i] != ground_truth(node):
+                    edge_colors[i] = '#FF0000'
+                    edge_widths[i] = 3.0
+        
+        nx.draw_networkx(
+            G, 
+            pos, 
+            node_color=node_colors, 
+            with_labels=True, 
+            node_size=600, 
+            font_size=8,
+            edge_color='#CCCCCC',
+            edgecolors=edge_colors,
+            linewidths=edge_widths,
+            alpha=0.9
+        )
+        
+        title = f"{name} Communities\nSolver: {args.solver}, Strategy: {args.strategy}, Lambda: {lambda_val}"
+        plt.title(title)
+        
+        safe_name = name.lower().replace(" ", "_").replace("'", "")
+        plot_path = os.path.join(
+            os.path.dirname(__file__), "..", "data", "community_plots", f"{safe_name}.png"
+        )
+        plt.savefig(plot_path, dpi=150, bbox_inches='tight')
+        plt.close()
+        print(f"Visualization saved to {os.path.abspath(plot_path)}")
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -100,6 +149,9 @@ def main():
     parser.add_argument(
         "--max_cycles", type=int, default=100, help="Maximum number of expansion cycles"
     )
+    parser.add_argument(
+        "--visualize", action="store_true", help="Generate and save community plots"
+    )
     args = parser.parse_args()
 
     G_karate = nx.karate_club_graph()
@@ -115,6 +167,7 @@ def main():
         args,
         lambda_val=10,
         ground_truth=karate_gt,
+        visualize=args.visualize
     )
 
     G_lesmis = nx.les_miserables_graph()
@@ -132,7 +185,7 @@ def main():
         "Boulatruelle": 2,
     }
     run_community_detection(
-        G_lesmis, "Les Misérables", lesmis_seeds, args, lambda_val=8
+        G_lesmis, "Les Misérables", lesmis_seeds, args, lambda_val=8, visualize=args.visualize
     )
 
 
