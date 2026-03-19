@@ -9,7 +9,10 @@
 #include "strategies/GreedyStrategy.hpp"
 #include "strategies/RandomizedStrategy.hpp"
 #include "solvers/BKSolver.hpp"
+#ifdef USE_OR_TOOLS
 #include "solvers/ORToolsSolver.hpp"
+#endif
+
 
 namespace py = pybind11;
 
@@ -43,7 +46,11 @@ void bind_types(py::module &m, const std::string &type_suffix) {
             if (solver_type == "bk") {
                 factory = [](int v, int e) { return std::make_unique<BKSolver<T>>(v, e); };
             } else if (solver_type == "ortools") {
+#ifdef USE_OR_TOOLS
                 factory = [](int v, int e) { return std::make_unique<ORToolsSolver<T>>(); };
+#else
+                throw std::invalid_argument("OR-Tools solver not enabled at compile time.");
+#endif
             } else {
                 throw std::invalid_argument("Unknown solver type: " + solver_type + ". Use 'bk' or 'ortools'.");
             }

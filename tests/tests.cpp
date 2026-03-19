@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include "solvers/BKSolver.hpp"
+#ifdef USE_OR_TOOLS
 #include "solvers/ORToolsSolver.hpp"
+#endif
 
 #include <vector>
 #include <memory>
@@ -104,6 +106,7 @@ TEST_P(EnergyMinimizationTest, 2DGridMRF) {
     EXPECT_EQ(e->minimize(), 2);
 }
 
+#ifdef USE_OR_TOOLS
 INSTANTIATE_TEST_SUITE_P(
     MaxFlowSolvers,
     EnergyMinimizationTest,
@@ -112,3 +115,12 @@ INSTANTIATE_TEST_SUITE_P(
         [](int v, int e) -> MaxFlowSolver<int>* { return new ORToolsSolver<int>(); }
     )
 );
+#else
+INSTANTIATE_TEST_SUITE_P(
+    MaxFlowSolvers,
+    EnergyMinimizationTest,
+    ::testing::Values(
+        [](int v, int e) -> MaxFlowSolver<int>* { return new BKSolver<int>(v, e); }
+    )
+);
+#endif

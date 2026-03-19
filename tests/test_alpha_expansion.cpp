@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include "solvers/BKSolver.hpp"
+#ifdef USE_OR_TOOLS
 #include "solvers/ORToolsSolver.hpp"
+#endif
 #include "core/EnergyModel.hpp"
 #include "core/AlphaExpansion.hpp"
 #include "strategies/SequentialStrategy.hpp"
@@ -24,7 +26,11 @@ template <typename T>
 auto get_factory(SolverType solver_type) {
     return [solver_type](const int v, const int e) -> std::unique_ptr<MaxFlowSolver<T>> {
         if (solver_type == SolverType::BK) return std::make_unique<BKSolver<T>>(v, e);
+#ifdef USE_OR_TOOLS
         else return std::make_unique<ORToolsSolver<T>>();
+#else
+        else throw std::runtime_error("ORToolsSolver disabled");
+#endif
     };
 }
 
@@ -311,7 +317,11 @@ INSTANTIATE_TEST_SUITE_P(
     AllCombinations,
     AlphaExpansionTest,
     ::testing::Combine(
+#ifdef USE_OR_TOOLS
         ::testing::Values(SolverType::BK, SolverType::ORTools),
+#else
+        ::testing::Values(SolverType::BK),
+#endif
         ::testing::Values(StrategyType::Sequential, StrategyType::Greedy, StrategyType::Randomized)
     )
 );

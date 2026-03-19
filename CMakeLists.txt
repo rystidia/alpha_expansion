@@ -38,11 +38,16 @@ include(GoogleTest)
 gtest_discover_tests(alpha_expansion_tests)
 
 # Google OR-Tools dependency
-find_package(ortools CONFIG REQUIRED)
+option(USE_OR_TOOLS "Enable Google OR-Tools dependency" ON)
 
-target_link_libraries(alpha_expansion_tests
-  ortools::ortools
-)
+if(USE_OR_TOOLS)
+  find_package(ortools CONFIG REQUIRED)
+
+  target_link_libraries(alpha_expansion_tests
+    ortools::ortools
+  )
+  target_compile_definitions(alpha_expansion_tests PRIVATE USE_OR_TOOLS)
+endif()
 
 # Python bindings with pybind11
 FetchContent_Declare(
@@ -53,4 +58,9 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(pybind11)
 
 pybind11_add_module(alpha_expansion_py src/bindings/bindings.cpp)
-target_link_libraries(alpha_expansion_py PRIVATE graph_cuts ortools::ortools)
+target_link_libraries(alpha_expansion_py PRIVATE graph_cuts)
+
+if(USE_OR_TOOLS)
+  target_link_libraries(alpha_expansion_py PRIVATE ortools::ortools)
+  target_compile_definitions(alpha_expansion_py PRIVATE USE_OR_TOOLS)
+endif()
