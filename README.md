@@ -11,3 +11,16 @@ This is a C++ library for the Alpha-Expansion algorithm. It is usually used in c
 - `src/`: The main C++ code.
 - `tests/`: C++ unit tests (we use GoogleTest).
 - `scripts/`: Python scripts for running experiments and visualizing results.
+
+## How to Build
+To build the C++ tests and the Python bindings, run these commands:
+```bash
+cmake -B build -S .
+cmake --build build -j4
+```
+
+Google OR-Tools is enabled by default. If you don't have OR-Tools installed, you can turn it off:
+```bash
+cmake -B build -S . -DUSE_OR_TOOLS=OFF
+cmake --build build -j4
+```
