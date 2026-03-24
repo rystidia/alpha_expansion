@@ -91,7 +91,9 @@ After building, you can run the unit tests to make sure everything works:
 ```
 
 ## References
-This library is based on academic research. The max-flow solver implementation is from Yuri Boykov and Vladimir Kolmogorov. If you use this software for research, please cite:
+This library is based on academic research on graph cuts. The alpha-expansion algorithm was introduced by Boykov, Veksler, and Zabih, and the underlying max-flow solver implementation is from Yuri Boykov and Vladimir Kolmogorov. If you use this software for research, please cite:
+- *Efficient Approximate Energy Minimization via Graph Cuts.* Y. Boykov, O. Veksler, R.Zabih. IEEE TPAMI 2001.
+- *What Energy Functions can be Minimized via Graph Cuts?* V. Kolmogorov, R.Zabih. IEEE TPAMI 2004.
 - *An Experimental Comparison of Min-Cut/Max-Flow Algorithms for Energy Minimization in Vision.* Yuri Boykov and Vladimir Kolmogorov. IEEE PAMI 2004.
 - *Efficiently Solving Dynamic Markov Random Fields Using Graph Cuts.* Pushmeet Kohli and Philip H.S. Torr. ICCV 2005.
 
