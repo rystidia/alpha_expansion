@@ -94,3 +94,6 @@ After building, you can run the unit tests to make sure everything works:
 This library is based on academic research. The max-flow solver implementation is from Yuri Boykov and Vladimir Kolmogorov. If you use this software for research, please cite:
 - *An Experimental Comparison of Min-Cut/Max-Flow Algorithms for Energy Minimization in Vision.* Yuri Boykov and Vladimir Kolmogorov. IEEE PAMI 2004.
 - *Efficiently Solving Dynamic Markov Random Fields Using Graph Cuts.* Pushmeet Kohli and Philip H.S. Torr. ICCV 2005.
+
+## License
+Because this library includes the Boykov-Kolmogorov max-flow solver (`src/bk_maxflow_impl`), it is restricted to **research purposes only**. You can use this software for academic and non-commercial projects.
