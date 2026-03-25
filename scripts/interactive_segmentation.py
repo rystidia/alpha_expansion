@@ -1,4 +1,5 @@
 import sys
+
 import numpy as np
 from PIL import Image
 
@@ -42,15 +43,16 @@ class DrawableScene(QGraphicsScene):
         self.colors = []
         self.pen_width = 10
         self.can_draw = False
+        self.ae_started = False
 
     def mousePressEvent(self, event):
-        if not self.can_draw:
+        if not self.can_draw or self.ae_started:
             return
         if event.button() == Qt.MouseButton.LeftButton:
             self._draw_point(event.scenePos().x(), event.scenePos().y())
 
     def mouseMoveEvent(self, event):
-        if not self.can_draw:
+        if not self.can_draw or self.ae_started:
             return
         if event.buttons() & Qt.MouseButton.LeftButton:
             self._draw_point(event.scenePos().x(), event.scenePos().y())
@@ -77,6 +79,9 @@ class InteractiveSegmentationApp(QMainWindow):
         self.image_path = None
         self.original_image = None
         self.scribble_mask = None
+        self.ae_started = False
+        self.model = None
+        self.optimizer = None
 
         self.preset_colors = [
             QColor(255, 0, 0),
@@ -121,6 +126,21 @@ class InteractiveSegmentationApp(QMainWindow):
         self.rebuild_labels_ui()
 
         toolbar_layout.addStretch()
+
+        self.btn_init = QPushButton("Initialize Energy Model")
+        self.btn_init.clicked.connect(self.initialize_model)
+        toolbar_layout.addWidget(self.btn_init)
+
+        self.btn_step = QPushButton("Step (1 Alpha Move)")
+        self.btn_step.clicked.connect(self.step_algorithm)
+        self.btn_step.setEnabled(False)
+        toolbar_layout.addWidget(self.btn_step)
+
+        self.btn_run = QPushButton("Run to Convergence")
+        self.btn_run.clicked.connect(self.run_algorithm)
+        self.btn_run.setEnabled(False)
+        toolbar_layout.addWidget(self.btn_run)
+
         main_layout.addLayout(toolbar_layout, 1)
 
         main_layout.addWidget(self.view, 4)
@@ -136,6 +156,13 @@ class InteractiveSegmentationApp(QMainWindow):
 
     def display_image(self, pil_image):
         self.scene.can_draw = True
+        self.ae_started = False
+        self.model = None
+        self.optimizer = None
+        self.scene.ae_started = False
+        self.btn_init.setEnabled(True)
+        self.btn_step.setEnabled(False)
+        self.btn_run.setEnabled(False)
         self.scribble_mask = np.full(
             (pil_image.height, pil_image.width), -1, dtype=np.int32
         )
@@ -190,6 +217,12 @@ class InteractiveSegmentationApp(QMainWindow):
                 return
 
     def add_label_ui(self):
+        if self.ae_started:
+            QMessageBox.warning(
+                self, "Warning", "Cannot add labels after algorithm has started."
+            )
+            return
+
         if len(self.scene.colors) >= len(self.preset_colors):
             QMessageBox.warning(
                 self, "Warning", f"Maximum {len(self.preset_colors)} labels reached!"
@@ -201,6 +234,12 @@ class InteractiveSegmentationApp(QMainWindow):
         self.set_label(len(self.scene.colors) - 1)
 
     def remove_label(self, label_idx):
+        if self.ae_started:
+            QMessageBox.warning(
+                self, "Warning", "Cannot remove labels after algorithm has started."
+            )
+            return
+
         if len(self.scene.colors) <= 2:
             QMessageBox.warning(
                 self, "Warning", "You need at least two labels for alpha-expansion!"
@@ -272,6 +311,147 @@ class InteractiveSegmentationApp(QMainWindow):
         x_min, x_max = max(0, x - r), min(w, x + r + 1)
         y_min, y_max = max(0, y - r), min(h, y + r + 1)
         mask[y_min:y_max, x_min:x_max] = label_idx
+
+    def initialize_model(self):
+        if self.original_image is None:
+            QMessageBox.warning(self, "Warning", "Please load an image first.")
+            return
+
+        data = np.array(self.original_image, dtype=np.float32)
+        h, w, _ = data.shape
+        num_labels = len(self.scene.colors)
+
+        mean_colors = np.zeros((num_labels, 3), dtype=np.float32)
+
+        for i in range(num_labels):
+            mask = self.scribble_mask == i
+            if not np.any(mask):
+                QMessageBox.warning(
+                    self,
+                    "Warning",
+                    f"Label {i} has no scribbles! Please scribble all labels.",
+                )
+                return
+            mean_colors[i] = np.mean(data[mask], axis=0)
+
+        print("Mean colors extracted:", mean_colors)
+
+        unary_costs = np.zeros((h, w, num_labels), dtype=np.float64)
+        for i in range(num_labels):
+            dist = np.linalg.norm(data - mean_colors[i], axis=-1)
+            unary_costs[:, :, i] = dist
+
+        MAX_COST = 2000
+        for i in range(num_labels):
+            mask_i = self.scribble_mask == i
+            unary_costs[:, :, i][mask_i] = 0.0
+            for j in range(num_labels):
+                if i != j:
+                    unary_costs[:, :, i][self.scribble_mask == j] = MAX_COST
+
+        print("Unary costs computed.")
+
+        self.model = ae.EnergyModel(h * w, num_labels)
+
+        flat_unary = unary_costs.flatten().astype(np.int32).tolist()
+        self.model.set_unary_costs(flat_unary)
+
+        print("Pairwise costs computed. Linking C++ Grid Edges...")
+        self.model.add_grid_edges(w, h)
+
+        pairwise_costs = np.full((num_labels, num_labels), 20, dtype=np.int32)
+        np.fill_diagonal(pairwise_costs, 0)
+        self.model.set_pairwise_costs(pairwise_costs.flatten().tolist())
+
+        print("Initializing optimizer...")
+        self.optimizer = ae.AlphaExpansionInt(self.model)
+
+        self.ae_started = True
+        self.scene.ae_started = True
+        self.btn_init.setEnabled(False)
+        self.btn_step.setEnabled(True)
+        self.btn_run.setEnabled(True)
+        self.moves_without_change = 0
+
+        QMessageBox.information(
+            self,
+            "Success",
+            "Energy Model successfully initialized. You can now step through iterations.",
+        )
+
+    def update_canvas_from_labels(self):
+        labels = self.model.get_labels()
+        h, w = self.original_image.height, self.original_image.width
+        labels_img = np.array(labels, dtype=np.int32).reshape((h, w))
+
+        colored = np.zeros((h, w, 3), dtype=np.uint8)
+        for i, color in enumerate(self.scene.colors):
+            colored[labels_img == i] = [color.red(), color.green(), color.blue()]
+
+        q_img = QImage(colored.data, w, h, 3 * w, QImage.Format.Format_RGB888)
+        self.scene.clear()
+        self.scene.addPixmap(QPixmap.fromImage(q_img))
+        self.scene.setSceneRect(0, 0, w, h)
+
+        if self.scribble_mask is not None:
+            overlay_data = np.zeros((h, w, 4), dtype=np.uint8)
+            for i, c in enumerate(self.scene.colors):
+                overlay_data[self.scribble_mask == i] = [
+                    c.red(),
+                    c.green(),
+                    c.blue(),
+                    255,
+                ]
+            q_overlay = QImage(
+                overlay_data.data, w, h, 4 * w, QImage.Format.Format_RGBA8888
+            )
+            self.scene.addPixmap(QPixmap.fromImage(q_overlay))
+
+    def step_algorithm(self):
+        if not self.ae_started:
+            QMessageBox.warning(self, "Warning", "Please initialize the model first.")
+            return
+
+        if not hasattr(self, "current_alpha"):
+            self.current_alpha = 0
+
+        changed = self.optimizer.perform_expansion_move(self.current_alpha)
+
+        if changed:
+            self.moves_without_change = 0
+        else:
+            self.moves_without_change += 1
+
+        self.update_canvas_from_labels()
+
+        if self.moves_without_change >= len(self.scene.colors):
+            QMessageBox.information(
+                self,
+                "Converged",
+                f"Algorithm converged! Final Energy: {self.model.evaluate_total_energy()}",
+            )
+            self.btn_step.setEnabled(False)
+            self.btn_run.setEnabled(False)
+            return
+
+        self.current_alpha = (self.current_alpha + 1) % len(self.scene.colors)
+
+    def run_algorithm(self):
+        if not self.ae_started:
+            QMessageBox.warning(self, "Warning", "Please initialize the model first.")
+            return
+
+        strategy = ae.SequentialStrategyInt(20)
+        strategy.execute(self.optimizer, self.model)
+        self.update_canvas_from_labels()
+
+        self.btn_step.setEnabled(False)
+        self.btn_run.setEnabled(False)
+        QMessageBox.information(
+            self,
+            "Done",
+            f"Optimization finished. Final Energy: {self.model.evaluate_total_energy()}",
+        )
 
 
 if __name__ == "__main__":
