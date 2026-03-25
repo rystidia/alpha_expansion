@@ -30,11 +30,7 @@ def main():
 
     model = ae.EnergyModel(num_nodes, num_labels, "int32")
 
-    for y in range(height):
-        for x in range(width):
-            node = y * width + x
-            if x + 1 < width: model.add_neighbor(node, node + 1)
-            if y + 1 < height: model.add_neighbor(node, node + width)
+    model.add_grid_edges(width, height)
 
     LAMBDA = 20
     MAX_UNARY_COST = 50
@@ -61,7 +57,7 @@ def main():
     frame_count = 0
     
     def save_frame(label_vec, title, cycle, alpha):
-        nonlocal frame_count
+        global frame_count
         labels = np.array(label_vec, dtype=np.uint8).reshape((height, width))
         img_data = labels * (255 // (num_labels - 1))
         

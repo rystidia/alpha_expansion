@@ -72,13 +72,7 @@ void run_Test2DGridDenosing(SolverType solver_type, StrategyType strategy_type) 
         return l1 == l2 ? 0 : 20;
     });
 
-    for (int y = 0; y < H; ++y) {
-        for (int x = 0; x < W; ++x) {
-            int i = y * W + x;
-            if (x < W - 1) model.add_neighbor(i, i + 1);
-            if (y < H - 1) model.add_neighbor(i, i + W);
-        }
-    }
+    model.add_grid_edges(W, H);
 
     AlphaExpansion<T> optimizer(model, get_factory<T>(solver_type));
 
@@ -288,13 +282,7 @@ void run_TestSnakeMRF(SolverType solver_type, StrategyType strategy_type) {
         return weight;
     });
 
-    for (int y = 0; y < h; ++y) {
-        for (int x = 0; x < w; ++x) {
-            int i = y * w + x;
-            if (x < w - 1) model.add_neighbor(i, i + 1);
-            if (y < h - 1) model.add_neighbor(i, i + w);
-        }
-    }
+    model.add_grid_edges(w, h);
 
     AlphaExpansion<T> optimizer(model, get_factory<T>(solver_type));
     auto [strategy_name, cycles] = execute_strategy<T>(strategy_type, optimizer, model);

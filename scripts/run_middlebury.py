@@ -48,13 +48,7 @@ def main():
     model = ae.EnergyModel(num_nodes, num_labels, "int32")
 
     print("Adding 4-connected grid neighbors...")
-    for y in range(height):
-        for x in range(width):
-            node = y * width + x
-            if x + 1 < width:
-                model.add_neighbor(node, node + 1)
-            if y + 1 < height:
-                model.add_neighbor(node, node + width)
+    model.add_grid_edges(width, height)
 
     print("Defining and precomputing energy arrays...")
     LAMBDA = 20
