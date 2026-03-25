@@ -97,5 +97,9 @@ This library is based on academic research on graph cuts. The alpha-expansion al
 - *An Experimental Comparison of Min-Cut/Max-Flow Algorithms for Energy Minimization in Vision.* Yuri Boykov and Vladimir Kolmogorov. IEEE PAMI 2004.
 - *Efficiently Solving Dynamic Markov Random Fields Using Graph Cuts.* Pushmeet Kohli and Philip H.S. Torr. ICCV 2005.
 
-## License
-Because this library includes the Boykov-Kolmogorov max-flow solver (`src/bk_maxflow_impl`), it is restricted to **research purposes only**. You can use this software for academic and non-commercial projects.
+## License and Copyright
+This project implements the alpha-expansion algorithm and includes the Boykov-Kolmogorov max-flow solver (`src/bk_maxflow_impl`). 
+
+The included max-flow solver was developed by Yuri Boykov and Vladimir Kolmogorov. Its license strictly restricts its use to **research purposes only**. Commercial use is not permitted. Therefore, this entire library—including its modifications, wrappers, and Python bindings—can be used and distributed for academic and non-commercial projects only. 
+
+If you use this library in your research, you **must** cite the four publications listed in the References section above, as per the original authors' licensing requirements.
