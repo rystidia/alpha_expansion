@@ -57,6 +57,23 @@ public:
         neighbors_[node2].push_back(node1);
     }
 
+    void add_grid_edges(int width, int height) {
+        if (width * height != num_nodes_) {
+            throw std::invalid_argument("Grid dimensions do not match the number of nodes");
+        }
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                int node = y * width + x;
+                if (x + 1 < width) {
+                    add_neighbor(node, node + 1);
+                }
+                if (y + 1 < height) {
+                    add_neighbor(node, node + width);
+                }
+            }
+        }
+    }
+
     [[nodiscard]] const std::vector<int>& get_neighbors(int node) const {
         return neighbors_[node];
     }

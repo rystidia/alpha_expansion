@@ -34,6 +34,7 @@ void bind_types(py::module &m, const std::string &type_suffix) {
         .def("get_unary_cost", &EnergyModel<T>::get_unary_cost, py::arg("node"), py::arg("label"))
         .def("get_pairwise_cost", &EnergyModel<T>::get_pairwise_cost, py::arg("node1"), py::arg("node2"), py::arg("label1"), py::arg("label2"))
         .def("add_neighbor", &EnergyModel<T>::add_neighbor, py::arg("node1"), py::arg("node2"))
+        .def("add_grid_edges", &EnergyModel<T>::add_grid_edges, py::arg("width"), py::arg("height"))
         .def("get_neighbors", &EnergyModel<T>::get_neighbors, py::arg("node"))
         .def("get_active_nodes", &EnergyModel<T>::get_active_nodes, py::arg("alpha_label"))
         .def("evaluate_total_energy", py::overload_cast<>(&EnergyModel<T>::evaluate_total_energy, py::const_))
