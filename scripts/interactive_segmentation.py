@@ -321,7 +321,8 @@ class InteractiveSegmentationApp(QMainWindow):
         h, w, _ = data.shape
         num_labels = len(self.scene.colors)
 
-        mean_colors = np.zeros((num_labels, 3), dtype=np.float32)
+        means = []
+        cov_invs = []
 
         for i in range(num_labels):
             mask = self.scribble_mask == i
@@ -332,14 +333,20 @@ class InteractiveSegmentationApp(QMainWindow):
                     f"Label {i} has no scribbles! Please scribble all labels.",
                 )
                 return
-            mean_colors[i] = np.mean(data[mask], axis=0)
+            pixels = data[mask].reshape(-1, 3).astype(np.float64)
+            mean = np.mean(pixels, axis=0)
+            cov = np.cov(pixels.T) + np.eye(3) * 1e-6
+            means.append(mean)
+            cov_invs.append(np.linalg.inv(cov))
 
-        print("Mean colors extracted:", mean_colors)
+        print("Gaussian models fitted:", [m.tolist() for m in means])
 
+        flat_pixels = data.reshape(-1, 3).astype(np.float64)
         unary_costs = np.zeros((h, w, num_labels), dtype=np.float64)
         for i in range(num_labels):
-            dist = np.linalg.norm(data - mean_colors[i], axis=-1)
-            unary_costs[:, :, i] = dist
+            diff = flat_pixels - means[i]
+            mahal = np.sqrt(np.einsum("ij,jk,ik->i", diff, cov_invs[i], diff))
+            unary_costs[:, :, i] = mahal.reshape(h, w)
 
         MAX_COST = 2000
         for i in range(num_labels):
@@ -455,7 +462,7 @@ class InteractiveSegmentationApp(QMainWindow):
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.path)
+    app = QApplication(sys.argv)
     window = InteractiveSegmentationApp()
     window.show()
     sys.exit(app.exec())
