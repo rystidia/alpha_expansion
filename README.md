@@ -13,16 +13,32 @@ This is a C++ library for the Alpha-Expansion algorithm. It is usually used in c
 - `scripts/`: Python scripts for running experiments and visualizing results.
 
 ## How to Build
-To build the C++ tests and the Python bindings, run these commands:
+
+### System Dependencies
+You need the Python development headers for the Python bindings:
 ```bash
-cmake -B build -S .
-cmake --build build -j4
+sudo apt-get install -y python3-dev
 ```
 
-Google OR-Tools is enabled by default. If you don't have OR-Tools installed, you can turn it off:
+### Installing OR-Tools
+OR-Tools is enabled by default. Download the prebuilt C++ binary for your platform from the [OR-Tools releases page](https://github.com/google/or-tools/releases), then install it to `/opt/ortools`:
+```bash
+sudo mkdir -p /opt/ortools
+sudo tar -xzf /path/to/your/ortools.tar.gz -C /opt/ortools --strip-components=1
+```
+
+### Building
+```bash
+cmake -B build -S .
+cmake --build build -j$(nproc)
+```
+
+CMake will find OR-Tools automatically if installed to `/opt/ortools`, as CMake searches `/opt/<name>` by convention on Unix.
+
+If you don't want to install OR-Tools, you can disable it:
 ```bash
 cmake -B build -S . -DUSE_OR_TOOLS=OFF
-cmake --build build -j4
+cmake --build build -j$(nproc)
 ```
 
 ## How to use in Python
