@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <functional>
+#include <unordered_map>
 #include <cstdint>
 
 template <typename T>
@@ -32,6 +33,12 @@ public:
     }
 
     [[nodiscard]] T get_pairwise_cost(int node1, int node2, int label1, int label2) const {
+        if (!edge_weights_.empty()) {
+            auto it = edge_weights_.find(edge_key(node1, node2));
+            if (it != edge_weights_.end()) {
+                return label1 == label2 ? T{0} : it->second;
+            }
+        }
         if (!pairwise_costs_.empty()) {
             return pairwise_costs_[label1 * num_labels_ + label2];
         }
@@ -50,6 +57,15 @@ public:
             throw std::invalid_argument("Pairwise costs array must have size num_labels * num_labels");
         }
         pairwise_costs_ = costs;
+    }
+
+    void set_edge_weights(const std::vector<int>& n1s, const std::vector<int>& n2s, const std::vector<T>& weights) {
+        if (n1s.size() != n2s.size() || n1s.size() != weights.size()) {
+            throw std::invalid_argument("n1s, n2s, and weights must have the same size");
+        }
+        for (size_t i = 0; i < n1s.size(); ++i) {
+            edge_weights_[edge_key(n1s[i], n2s[i])] = weights[i];
+        }
     }
 
     void add_neighbor(int node1, int node2) {
@@ -108,6 +124,11 @@ public:
     }
 
 private:
+    int64_t edge_key(int n1, int n2) const {
+        int a = std::min(n1, n2), b = std::max(n1, n2);
+        return (int64_t)a * num_nodes_ + b;
+    }
+
     int num_nodes_;
     int num_labels_;
     std::vector<int> labels_;
@@ -116,4 +137,5 @@ private:
     PairwiseCostFn pairwise_cost_fn_;
     std::vector<T> unary_costs_;
     std::vector<T> pairwise_costs_;
+    std::unordered_map<int64_t, T> edge_weights_;
 };
