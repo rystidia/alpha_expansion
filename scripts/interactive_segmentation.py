@@ -312,6 +312,28 @@ class InteractiveSegmentationApp(QMainWindow):
         y_min, y_max = max(0, y - r), min(h, y + r + 1)
         mask[y_min:y_max, x_min:x_max] = label_idx
 
+    def _compute_grid_edge_weights(self, data, w, h, lambda_smooth=50.0):
+        data_f = data.astype(np.float64)
+        sigma_sq = np.var(data_f)
+        node_ids = np.arange(h * w).reshape(h, w)
+
+        # horizontal edges: each pixel (y, x) paired with its right neighbor (y, x+1)
+        h_n1 = node_ids[:, :-1].flatten()
+        h_n2 = node_ids[:, 1:].flatten()
+        h_diff_sq = np.sum((data_f[:, :-1] - data_f[:, 1:]) ** 2, axis=2).flatten()
+        h_weights = (lambda_smooth * np.exp(-h_diff_sq / (2 * sigma_sq))).astype(np.int32)
+
+        # vertical edges: each pixel (y, x) paired with its bottom neighbor (y+1, x)
+        v_n1 = node_ids[:-1, :].flatten()
+        v_n2 = node_ids[1:, :].flatten()
+        v_diff_sq = np.sum((data_f[:-1, :] - data_f[1:, :]) ** 2, axis=2).flatten()
+        v_weights = (lambda_smooth * np.exp(-v_diff_sq / (2 * sigma_sq))).astype(np.int32)
+
+        n1s = np.concatenate([h_n1, v_n1]).tolist()
+        n2s = np.concatenate([h_n2, v_n2]).tolist()
+        weights = np.concatenate([h_weights, v_weights]).tolist()
+        return n1s, n2s, weights
+
     def initialize_model(self):
         if self.original_image is None:
             QMessageBox.warning(self, "Warning", "Please load an image first.")
@@ -363,12 +385,10 @@ class InteractiveSegmentationApp(QMainWindow):
         flat_unary = unary_costs.flatten().astype(np.int32).tolist()
         self.model.set_unary_costs(flat_unary)
 
-        print("Pairwise costs computed. Linking C++ Grid Edges...")
+        print("Computing contrast-sensitive edge weights...")
+        n1s, n2s, weights = self._compute_grid_edge_weights(data, w, h)
         self.model.add_grid_edges(w, h)
-
-        pairwise_costs = np.full((num_labels, num_labels), 20, dtype=np.int32)
-        np.fill_diagonal(pairwise_costs, 0)
-        self.model.set_pairwise_costs(pairwise_costs.flatten().tolist())
+        self.model.set_edge_weights(n1s, n2s, weights)
 
         print("Initializing optimizer...")
         self.optimizer = ae.AlphaExpansionInt(self.model)
