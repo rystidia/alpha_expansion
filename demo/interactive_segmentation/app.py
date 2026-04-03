@@ -93,6 +93,17 @@ class ExpansionApp(QMainWindow):
         self._btn_init.setEnabled(True)
         self._btn_step.setEnabled(False)
         self._btn_run.setEnabled(False)
+        if isinstance(problem, CommunityDetectionProblem):
+            problem._on_graph_selected = self._initialize_and_render
+
+    def _initialize_and_render(self):
+        self._model, self._optimizer = self._problem.build_model()
+        self._alpha = 0
+        self._moves_without_change = 0
+        self._btn_init.setEnabled(False)
+        self._btn_step.setEnabled(True)
+        self._btn_run.setEnabled(True)
+        self._update_canvas()
 
     def _initialize(self):
         try:

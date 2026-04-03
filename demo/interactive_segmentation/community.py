@@ -54,6 +54,7 @@ class CommunityDetectionProblem(Problem):
         self._scene = None
         self._param_widget = None
         self._btn_group = None
+        self._on_graph_selected = None
 
     def get_scene(self) -> QGraphicsScene:
         if self._scene is None:
@@ -82,6 +83,8 @@ class CommunityDetectionProblem(Problem):
         self._G = G
         self._node_to_idx = {node: i for i, node in enumerate(G.nodes())}
         self._idx_to_node = {i: node for node, i in self._node_to_idx.items()}
+        if self._on_graph_selected:
+            self._on_graph_selected()
 
     def build_model(self):
         if self._config is None:
