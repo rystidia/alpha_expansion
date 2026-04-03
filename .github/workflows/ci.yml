@@ -84,11 +84,14 @@ jobs:
       with:
         name: compiled-build
 
+    - name: Run pytest
+      run: python -m pytest tests/ -v
+
     - name: Run Python Community Detection Script
       run: |
         cd scripts
         python run_community.py --solver bk --strategy sequential
-      
+
     - name: Verify OR-Tools Python execution
       run: |
         cd scripts
