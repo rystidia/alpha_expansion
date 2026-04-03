@@ -5,3 +5,5 @@ matplotlib>=3.5.0
 pydot>=1.4.2
 pyyaml>=6.0
 pybind11>=2.10.0
+PyQt6>=6.0.0
+pytest>=7.0.0
