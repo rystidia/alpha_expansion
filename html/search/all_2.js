@@ -1,9 +1,25 @@
 var searchData=
 [
-  ['energymodel_0',['energymodel',['../classEnergyModel.html',1,'EnergyModel&lt; T &gt;'],['../classEnergyModel.html#a27bd5c801a0d20bf80c79ced699d368d',1,'EnergyModel::EnergyModel()']]],
-  ['energymodel_2ehpp_1',['EnergyModel.hpp',['../EnergyModel_8hpp.html',1,'']]],
-  ['evaluate_5ftotal_5fenergy_2',['evaluate_total_energy',['../classEnergyModel.html#ae24b7ef0b24cf76e1aa2f79718f17ad3',1,'EnergyModel::evaluate_total_energy(const std::vector&lt; int &gt; &amp;eval_labels) const'],['../classEnergyModel.html#ace3f2e855a3d22a2775ee4909e938b2f',1,'EnergyModel::evaluate_total_energy() const']]],
-  ['execute_3',['execute',['../classExpansionStrategy.html#a7c323f62d780f534adf34108a849d05a',1,'ExpansionStrategy::execute()'],['../classGreedyStrategy.html#a662f6a7a1a3b6bec2d72cf087ae4df75',1,'GreedyStrategy::execute()'],['../classRandomizedStrategy.html#a6757c65696a7d522dc2bce5a1df1b2b9',1,'RandomizedStrategy::execute()'],['../classSequentialStrategy.html#aba0f75fa424ec3591b87dbf6d848fb2e',1,'SequentialStrategy::execute()']]],
-  ['expansionstrategy_4',['ExpansionStrategy',['../classExpansionStrategy.html',1,'']]],
-  ['expansionstrategy_2ehpp_5',['ExpansionStrategy.hpp',['../ExpansionStrategy_8hpp.html',1,'']]]
+  ['a_20custom_20expansion_20strategy_0',['Implementing a Custom Expansion Strategy',['../md_docs_2guides_2custom-strategy.html',1,'']]],
+  ['a_20custom_20max_20flow_20solver_1',['Implementing a Custom Max-Flow Solver',['../md_docs_2guides_2custom-solver.html',1,'']]],
+  ['a_20factory_20lambda_2',['2. Pass it via a factory lambda',['../md_docs_2guides_2custom-solver.html#autotoc_md9',1,'']]],
+  ['add_5fconstant_3',['add_constant',['../classMaxFlowSolver.html#a08b3d83be66b6b0bbf4ea67dcaaa415b',1,'MaxFlowSolver::add_constant()'],['../classORToolsSolver.html#ab2b575487ba676aa2b3720dff45a6540',1,'ORToolsSolver::add_constant()'],['../classBKSolver.html#ad4228a16dea7a797dbd553c42f67af10',1,'BKSolver::add_constant()']]],
+  ['add_5fedge_4',['add_edge',['../classORToolsSolver.html#ab1e16ecc336d0a2f2039d1fe0bf51ce5',1,'ORToolsSolver']]],
+  ['add_5fgrid_5fedges_5',['add_grid_edges',['../classEnergyModel.html#ac3a38aec3144b26bcaf49faec21f29ee',1,'EnergyModel']]],
+  ['add_5fneighbor_6',['add_neighbor',['../classEnergyModel.html#ad54c5dacb9b2b8d6f1e96482207b08ae',1,'EnergyModel']]],
+  ['add_5fterm1_7',['add_term1',['../classBKSolver.html#a7d1045fb5e603870365b7f12c691026a',1,'BKSolver::add_term1()'],['../classMaxFlowSolver.html#a44c352b6aa0e8ac1c82b491a25aba238',1,'MaxFlowSolver::add_term1()'],['../classORToolsSolver.html#a183597456596030ce555c13b39bceb0f',1,'ORToolsSolver::add_term1()']]],
+  ['add_5fterm2_8',['add_term2',['../classBKSolver.html#a436c4414fb188e20ec04de2796e33130',1,'BKSolver::add_term2()'],['../classORToolsSolver.html#a10383e3254ea91525356076fcda1e7a8',1,'ORToolsSolver::add_term2()'],['../classMaxFlowSolver.html#ad8dd896a23a5a615739e508183764d8a',1,'MaxFlowSolver::add_term2()']]],
+  ['add_5ftweights_9',['add_tweights',['../classORToolsSolver.html#afad55d1930aee41710c4aeea5d3cf075',1,'ORToolsSolver']]],
+  ['add_5fvariable_10',['add_variable',['../classBKSolver.html#acfc397e593c14b9697916716207532eb',1,'BKSolver::add_variable()'],['../classMaxFlowSolver.html#a2ab9e59af308d0b889667abd02ae3a66',1,'MaxFlowSolver::add_variable()'],['../classORToolsSolver.html#a48466351439cf4e438886c293278b446',1,'ORToolsSolver::add_variable()']]],
+  ['alpha_20expansion_20library_11',['Alpha Expansion Library',['../index.html',1,'']]],
+  ['alphaexpansion_12',['alphaexpansion',['../classAlphaExpansion.html',1,'AlphaExpansion&lt; T &gt;'],['../classAlphaExpansion.html#a86d503a9f0be02b211009d885e1d3c97',1,'AlphaExpansion::AlphaExpansion()']]],
+  ['alphaexpansion_20t_13',['AlphaExpansion&lt;T&gt;',['../md_docs_2guides_2architecture.html#autotoc_md2',1,'']]],
+  ['alphaexpansion_2ehpp_14',['AlphaExpansion.hpp',['../AlphaExpansion_8hpp.html',1,'']]],
+  ['an_20energy_20model_15',['Creating an Energy Model',['../md_docs_2guides_2python-api.html#autotoc_md35',1,'']]],
+  ['api_16',['Python API',['../md_docs_2guides_2python-api.html',1,'']]],
+  ['api_20reference_17',['API Reference',['../index.html#autotoc_md32',1,'']]],
+  ['app_18',['app',['../md_docs_2guides_2demo-app.html',1,'Demo App'],['../md_docs_2guides_2demo-app.html#autotoc_md18',1,'Launching the App']]],
+  ['architecture_19',['Architecture',['../md_docs_2guides_2architecture.html',1,'']]],
+  ['architecture_2emd_20',['architecture.md',['../architecture_8md.html',1,'']]],
+  ['available_20classes_21',['Available Classes',['../md_docs_2guides_2python-api.html#autotoc_md39',1,'']]]
 ];

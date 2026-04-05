@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Alpha Expansion Library: Main Page</title>
+<title>Alpha Expansion Library: Alpha Expansion Library</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -69,10 +69,34 @@ $(function() {
 </div>
 </div>
 
-<div class="header">
-  <div class="headertitle"><div class="title">Alpha Expansion Library Documentation</div></div>
+<div><div class="header">
+  <div class="headertitle"><div class="title">Alpha Expansion Library </div></div>
 </div><!--header-->
 <div class="contents">
+<div class="textblock"><p><a class="anchor" id="md_docs_2guides_2index"></a> A C++ library for the Alpha-Expansion graph-cut algorithm, with Python bindings. Alpha-expansion is used to minimize discrete Markov Random Field (MRF) energies and is commonly applied in image segmentation and community detection.</p>
+<h1><a class="anchor" id="autotoc_md30"></a>
+Features</h1>
+<ul>
+<li>Three expansion strategies: <b>Sequential</b>, <b>Greedy</b> and <b>Randomized</b></li>
+<li>Two max-flow backends: <b>Boykov-Kolmogorov</b> (default) and <b>Google OR-Tools</b></li>
+<li>Fully templated on cost type (<code>int32</code>, <code>float</code>, <code>double</code>)</li>
+<li>Python bindings via pybind11</li>
+<li>Extensible: plug in custom solvers and strategies</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md31"></a>
+Guides</h1>
+<ul>
+<li><a class="el" href="md_docs_2guides_2getting-started.html">Getting Started</a>: build the library and run your first optimization</li>
+<li><a class="el" href="md_docs_2guides_2architecture.html">Architecture</a>: how the four main classes fit together</li>
+<li><a class="el" href="md_docs_2guides_2custom-solver.html">Custom Solver</a>: implement a new max-flow backend</li>
+<li><a class="el" href="md_docs_2guides_2custom-strategy.html">Custom Strategy</a>: implement a new expansion strategy</li>
+<li><a class="el" href="md_docs_2guides_2python-api.html">Python API</a>: using the library from Python</li>
+<li><a class="el" href="md_docs_2guides_2demo-app.html">Demo App</a>: interactive visualization of the algorithm</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md32"></a>
+API Reference</h1>
+<p>See the class list in the sidebar for the full auto-generated API reference. </p>
+</div></div><!-- PageDoc -->
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

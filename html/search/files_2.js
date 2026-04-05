@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['energymodel_2ehpp_0',['EnergyModel.hpp',['../EnergyModel_8hpp.html',1,'']]],
-  ['expansionstrategy_2ehpp_1',['ExpansionStrategy.hpp',['../ExpansionStrategy_8hpp.html',1,'']]]
+  ['custom_2dsolver_2emd_0',['custom-solver.md',['../custom-solver_8md.html',1,'']]],
+  ['custom_2dstrategy_2emd_1',['custom-strategy.md',['../custom-strategy_8md.html',1,'']]]
 ];

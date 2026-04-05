@@ -1,5 +1,8 @@
 var searchData=
 [
-  ['pairwisecostfn_0',['PairwiseCostFn',['../classEnergyModel.html#a548f594d4bc4b34fc9f310586eae9fbe',1,'EnergyModel']]],
-  ['perform_5fexpansion_5fmove_1',['perform_expansion_move',['../classAlphaExpansion.html#a239705a5ccb31b5ec28fcd99b8db9fa4',1,'AlphaExpansion']]]
+  ['factory_20lambda_0',['2. Pass it via a factory lambda',['../md_docs_2guides_2custom-solver.html#autotoc_md9',1,'']]],
+  ['features_1',['Features',['../index.html#autotoc_md30',1,'']]],
+  ['first_20example_3a_20c_2',['First Example: C++',['../md_docs_2guides_2getting-started.html#autotoc_md27',1,'']]],
+  ['first_20example_3a_20python_3',['First Example: Python',['../md_docs_2guides_2getting-started.html#autotoc_md28',1,'']]],
+  ['flow_20solver_4',['Implementing a Custom Max-Flow Solver',['../md_docs_2guides_2custom-solver.html',1,'']]]
 ];

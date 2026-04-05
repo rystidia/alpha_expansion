@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['var_0',['Var',['../classMaxFlowSolver.html#ab6573b01a2a9f6ea427ed5e18ec959f1',1,'MaxFlowSolver']]]
+  ['lambda_0',['2. Pass it via a factory lambda',['../md_docs_2guides_2custom-solver.html#autotoc_md9',1,'']]],
+  ['launching_20the_20app_1',['Launching the App',['../md_docs_2guides_2demo-app.html#autotoc_md18',1,'']]],
+  ['library_2',['Alpha Expansion Library',['../index.html',1,'']]]
 ];

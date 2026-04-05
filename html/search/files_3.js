@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['greedystrategy_2ehpp_0',['GreedyStrategy.hpp',['../GreedyStrategy_8hpp.html',1,'']]]
+  ['demo_2dapp_2emd_0',['demo-app.md',['../demo-app_8md.html',1,'']]]
 ];

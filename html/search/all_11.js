@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['segmentation_20mode_0',['Image Segmentation Mode',['../md_docs_2guides_2demo-app.html#autotoc_md19',1,'']]],
+  ['sequentialstrategy_1',['sequentialstrategy',['../classSequentialStrategy.html#a28362d6fe05d2fc4aad4ffa275be014a',1,'SequentialStrategy::SequentialStrategy()'],['../classSequentialStrategy.html',1,'SequentialStrategy&lt; T &gt;']]],
+  ['sequentialstrategy_2ehpp_2',['SequentialStrategy.hpp',['../SequentialStrategy_8hpp.html',1,'']]],
+  ['set_5fedge_5fweights_3',['set_edge_weights',['../classEnergyModel.html#a4caeb05b405f72a1117e26be15846c7d',1,'EnergyModel']]],
+  ['set_5flabel_4',['set_label',['../classEnergyModel.html#a266792d3153ec163896849bbafefa33e',1,'EnergyModel']]],
+  ['set_5flabels_5',['set_labels',['../classEnergyModel.html#a8a38ad1256537c9c82e39c84d778b8c8',1,'EnergyModel']]],
+  ['set_5fpairwise_5fcost_5ffn_6',['set_pairwise_cost_fn',['../classEnergyModel.html#a6a2703b6c72c216f2102eac925d6b12b',1,'EnergyModel']]],
+  ['set_5fpairwise_5fcosts_7',['set_pairwise_costs',['../classEnergyModel.html#aed95bf5533c6bd7eb10117501beaf4c3',1,'EnergyModel']]],
+  ['set_5funary_5fcost_5ffn_8',['set_unary_cost_fn',['../classEnergyModel.html#a2c111a6bc1e4dd411467c3fc9f6a9202',1,'EnergyModel']]],
+  ['set_5funary_5fcosts_9',['set_unary_costs',['../classEnergyModel.html#a663637a2236ba8695cc7174826c4a5a7',1,'EnergyModel']]],
+  ['setting_20costs_10',['Setting Costs',['../md_docs_2guides_2python-api.html#autotoc_md36',1,'']]],
+  ['setup_11',['Setup',['../md_docs_2guides_2python-api.html#autotoc_md34',1,'']]],
+  ['single_20pass_20strategy_12',['Example: Single-Pass Strategy',['../md_docs_2guides_2custom-strategy.html#autotoc_md13',1,'']]],
+  ['solver_13',['Implementing a Custom Max-Flow Solver',['../md_docs_2guides_2custom-solver.html',1,'']]],
+  ['solverfactory_14',['SolverFactory',['../classAlphaExpansion.html#a8197e87b9d5d9e0ed35db2bfb10939d3',1,'AlphaExpansion']]],
+  ['started_15',['Getting Started',['../md_docs_2guides_2getting-started.html',1,'']]],
+  ['step_20by_20step_20control_16',['Step-by-Step Control',['../md_docs_2guides_2python-api.html#autotoc_md40',1,'']]],
+  ['step_20by_20step_20example_17',['Step-by-Step Example',['../md_docs_2guides_2custom-solver.html#autotoc_md7',1,'']]],
+  ['strategy_18',['strategy',['../md_docs_2guides_2custom-strategy.html#autotoc_md13',1,'Example: Single-Pass Strategy'],['../md_docs_2guides_2custom-strategy.html',1,'Implementing a Custom Expansion Strategy'],['../md_docs_2guides_2custom-strategy.html#autotoc_md14',1,'Using the Custom Strategy']]],
+  ['structure_19',['Graph Structure',['../md_docs_2guides_2python-api.html#autotoc_md37',1,'']]],
+  ['system_20requirements_20',['System Requirements',['../md_docs_2guides_2getting-started.html#autotoc_md23',1,'']]]
+];

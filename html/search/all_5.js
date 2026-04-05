@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['num_5flabels_0',['num_labels',['../classEnergyModel.html#a1451d4dc077c2726a4be8276ff1b8e7d',1,'EnergyModel']]],
-  ['num_5fnodes_1',['num_nodes',['../classEnergyModel.html#a8fb48e048537df7de762fb4b39fdd64a',1,'EnergyModel']]]
+  ['demo_20app_0',['Demo App',['../md_docs_2guides_2demo-app.html',1,'']]],
+  ['demo_2dapp_2emd_1',['demo-app.md',['../demo-app_8md.html',1,'']]],
+  ['detection_20mode_2',['Community Detection Mode',['../md_docs_2guides_2demo-app.html#autotoc_md20',1,'']]]
 ];

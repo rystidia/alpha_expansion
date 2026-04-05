@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sequentialstrategy_2ehpp_0',['SequentialStrategy.hpp',['../SequentialStrategy_8hpp.html',1,'']]]
+  ['maxflowsolver_2ehpp_0',['MaxFlowSolver.hpp',['../MaxFlowSolver_8hpp.html',1,'']]]
 ];
