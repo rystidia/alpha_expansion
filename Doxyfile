@@ -1,0 +1,17 @@
+PROJECT_NAME           = "Alpha Expansion Library"
+PROJECT_BRIEF          = "C++ library for the Alpha-Expansion graph-cut algorithm with Python bindings"
+OUTPUT_DIRECTORY       = docs/html
+INPUT                  = src/core src/strategies src/solvers docs/guides
+RECURSIVE              = YES
+FILE_PATTERNS          = *.hpp *.md
+EXTRACT_ALL            = YES
+GENERATE_LATEX         = NO
+GENERATE_HTML          = YES
+USE_MDFILE_AS_MAINPAGE = docs/guides/index.md
+HAVE_DOT               = YES
+DOT_IMAGE_FORMAT       = svg
+CALL_GRAPH             = NO
+CALLER_GRAPH           = NO
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = NO
+EXTENSION_MAPPING      = hpp=C++
