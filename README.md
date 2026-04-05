@@ -3,9 +3,21 @@
 This is a C++ library for the Alpha-Expansion algorithm. It is usually used in computer vision for things like image segmentation or stereo matching.
 
 ## Features
-- Three different expansion strategies: Sequential, Greedy, and Randomized.
+- Three different expansion strategies: Sequential, Greedy and Randomized.
 - Supports different Max-Flow solvers. Right now we have the Boykov-Kolmogorov (BK) solver and Google OR-Tools.
-- Python bindings. This means you can use the library inside your Python scripts.
+- Python bindings via pybind11.
+
+## Documentation
+
+The full API reference and guides are published at **https://rystidia.github.io/alpha_expansion/**.
+
+Guides available in `docs/guides/`:
+- [Getting Started](docs/guides/getting-started.md): build instructions and first examples in C++ and Python
+- [Architecture](docs/guides/architecture.md): overview of the four main classes
+- [Python API](docs/guides/python-api.md): how to use the Python bindings
+- [Demo App](docs/guides/demo-app.md): interactive PyQt6 demo for image segmentation and community detection
+- [Custom Solver](docs/guides/custom-solver.md): how to plug in your own max-flow backend
+- [Custom Strategy](docs/guides/custom-strategy.md): how to implement a new expansion strategy
 
 ## Folders
 - `src/`: The main C++ code.
@@ -76,7 +88,7 @@ cycles = strategy.execute(optimizer, model)
 ```
 
 ## How to use in C++
-The library is written in C++, so you can easily include it in your own code. Because the solver and strategy are decoupled, you can also write your own custom Max-Flow solvers or new expansion strategies by implementing the `MaxFlowSolver` and `ExpansionStrategy` interfaces!
+The library is written in C++, so you can include it in your own code. Because the solver and strategy are decoupled, you can also write your own custom Max-Flow solvers or new expansion strategies by implementing the `MaxFlowSolver` and `ExpansionStrategy` interfaces!
 
 Here is a simple example using the built-in ones:
 
