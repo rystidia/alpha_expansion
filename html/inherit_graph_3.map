@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classMaxFlowSolver.html" title="Abstract interface for a binary max&#45;flow / QPBO solver." alt="" coords="5,31,165,56"/>
+<area shape="rect" id="Node000001" href="$classBKSolver.html" title="MaxFlowSolver backed by the Boykov–Kolmogorov max&#45;flow algorithm." alt="" coords="230,5,349,31"/>
+<area shape="poly" id="edge4_Node000000_Node000001" title=" " alt="" coords="179,29,229,23,230,28,180,34"/>
+<area shape="rect" id="Node000002" href="$classORToolsSolver.html" title="MaxFlowSolver backed by Google OR&#45;Tools SimpleMaxFlow." alt="" coords="213,55,365,80"/>
+<area shape="poly" id="edge5_Node000000_Node000002" title=" " alt="" coords="179,52,213,56,213,61,179,57"/>
+</map>

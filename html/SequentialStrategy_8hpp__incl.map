@@ -1,0 +1,25 @@
+<map id="src/strategies/SequentialStrategy.hpp" name="src/strategies/SequentialStrategy.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="409,5,592,45"/>
+<area shape="rect" id="Node000002" href="$AlphaExpansion_8hpp.html" title=" " alt="" coords="289,93,475,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="473,48,412,88,409,84,470,43"/>
+<area shape="rect" id="Node000011" href="$ExpansionStrategy_8hpp.html" title=" " alt="" coords="500,93,739,119"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="531,43,592,84,589,88,528,48"/>
+<area shape="rect" id="Node000003" href="$EnergyModel_8hpp.html" title=" " alt="" coords="91,167,257,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="349,121,222,165,220,160,348,116"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,240,92,265"/>
+<area shape="poly" id="edge10_Node000002_Node000005" title=" " alt="" coords="289,118,167,137,115,151,81,169,70,181,63,196,54,227,49,225,58,194,66,178,78,165,113,146,166,132,288,113"/>
+<area shape="rect" id="Node000008" href="$MaxFlowSolver_8hpp.html" title=" " alt="" coords="282,167,482,192"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="385,119,385,153,379,153,379,119"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="506,167,583,192"/>
+<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="409,116,507,159,504,163,407,121"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="608,167,700,192"/>
+<area shape="poly" id="edge11_Node000002_Node000010" title=" " alt="" coords="426,116,598,161,596,166,425,121"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="116,240,179,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="172,193,159,228,154,226,167,191"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="155,194,82,235,80,231,153,190"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="203,240,327,265"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="190,190,241,229,237,233,187,194"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="351,240,418,265"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="209,189,339,233,338,238,207,195"/>
+<area shape="poly" id="edge8_Node000008_Node000007" title=" " alt="" coords="385,192,386,226,381,227,380,192"/>
+</map>

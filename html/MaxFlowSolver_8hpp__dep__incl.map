@@ -1,0 +1,15 @@
+<map id="src/solvers/MaxFlowSolver.hpp" name="src/solvers/MaxFlowSolver.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="478,5,701,31"/>
+<area shape="rect" id="Node000002" href="$AlphaExpansion_8hpp.html" title=" " alt="" coords="265,79,474,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="542,37,406,81,404,76,540,32"/>
+<area shape="rect" id="Node000006" href="$BKSolver_8hpp.html" title=" " alt="" coords="498,79,681,104"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="592,44,592,79,587,79,587,44"/>
+<area shape="rect" id="Node000007" href="$ORToolsSolver_8hpp.html" title=" " alt="" coords="705,79,919,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="639,32,777,76,775,81,637,37"/>
+<area shape="rect" id="Node000003" href="$GreedyStrategy_8hpp.html" title=" " alt="" coords="5,159,248,185"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="322,111,163,162,161,157,320,106"/>
+<area shape="rect" id="Node000004" href="$RandomizedStrategy_8hpp.html" title=" " alt="" coords="272,152,467,192"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="372,118,372,152,367,152,367,118"/>
+<area shape="rect" id="Node000005" href="$SequentialStrategy_8hpp.html" title=" " alt="" coords="491,152,674,192"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="414,106,532,149,530,154,412,111"/>
+</map>

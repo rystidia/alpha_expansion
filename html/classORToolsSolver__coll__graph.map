@@ -1,0 +1,5 @@
+<map id="ORToolsSolver&lt; T &gt;" name="ORToolsSolver&lt; T &gt;">
+<area shape="rect" id="Node000001" title="MaxFlowSolver backed by Google OR&#45;Tools SimpleMaxFlow." alt="" coords="9,79,161,104"/>
+<area shape="rect" id="Node000002" href="$classMaxFlowSolver.html" title="Abstract interface for a binary max&#45;flow / QPBO solver." alt="" coords="5,5,165,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="88,44,88,79,83,79,83,44"/>
+</map>
