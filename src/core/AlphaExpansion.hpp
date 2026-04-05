@@ -15,8 +15,46 @@ public:
         : model_(model), solver_factory_(std::move(solver_factory)) {
     }
 
+    [[nodiscard]] bool perform_expansion_move(const int alpha_label) const {
+        const std::vector<int> active_nodes = model_.get_active_nodes(alpha_label);
+        if (active_nodes.empty()) return false;
+
+        std::vector<typename MaxFlowSolver<T>::Var> node_var_ids;
+        const auto solver = build_expansion_graph(alpha_label, active_nodes, node_var_ids);
+
+        solver->minimize();
+
+        bool changed = false;
+        std::vector<int> proposed_labels = model_.get_labels();
+
+        for (const int node: active_nodes) {
+            if (const typename MaxFlowSolver<T>::Var var = node_var_ids[node]; solver->get_var(var) == 0) {
+                proposed_labels[node] = alpha_label;
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            T old_energy = model_.evaluate_total_energy();
+            T new_energy = model_.evaluate_total_energy(proposed_labels);
+            bool improved = false;
+            if constexpr (std::is_floating_point_v<T>) {
+                improved = (old_energy - new_energy > static_cast<T>(1e-5));
+            } else {
+                improved = (new_energy < old_energy);
+            }
+            if (improved) {
+                model_.set_labels(proposed_labels);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+private:
     std::unique_ptr<MaxFlowSolver<T>> build_expansion_graph(const int alpha_label, const std::vector<int> &active_nodes,
-                                                         std::vector<typename MaxFlowSolver<T>::Var> &node_var_ids) const {
+                                                            std::vector<typename MaxFlowSolver<T>::Var> &node_var_ids) const {
         const int num_active = active_nodes.size();
         if (num_active == 0) return nullptr;
 
@@ -65,44 +103,6 @@ public:
         return solver;
     }
 
-    [[nodiscard]] bool perform_expansion_move(const int alpha_label) const {
-        const std::vector<int> active_nodes = model_.get_active_nodes(alpha_label);
-        if (active_nodes.empty()) return false;
-
-        std::vector<typename MaxFlowSolver<T>::Var> node_var_ids;
-        const auto solver = build_expansion_graph(alpha_label, active_nodes, node_var_ids);
-
-        solver->minimize();
-
-        bool changed = false;
-        std::vector<int> proposed_labels = model_.get_labels();
-
-        for (const int node: active_nodes) {
-            if (const typename MaxFlowSolver<T>::Var var = node_var_ids[node]; solver->get_var(var) == 0) {
-                proposed_labels[node] = alpha_label;
-                changed = true;
-            }
-        }
-
-        if (changed) {
-            T old_energy = model_.evaluate_total_energy();
-            T new_energy = model_.evaluate_total_energy(proposed_labels);
-            bool improved = false;
-            if constexpr (std::is_floating_point_v<T>) {
-                improved = (old_energy - new_energy > static_cast<T>(1e-5));
-            } else {
-                improved = (new_energy < old_energy);
-            }
-            if (improved) {
-                model_.set_labels(proposed_labels);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-private:
     EnergyModel<T> &model_;
     SolverFactory solver_factory_;
 };
