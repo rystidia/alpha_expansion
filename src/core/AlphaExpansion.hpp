@@ -6,15 +6,38 @@
 #include <functional>
 #include <type_traits>
 
+/// @brief Performs alpha-expansion moves on an EnergyModel using a pluggable max-flow solver.
+///
+/// An `AlphaExpansion` object holds a reference to an `EnergyModel` and a factory function
+/// that creates a new `MaxFlowSolver` for each expansion move. The model must outlive the
+/// optimizer, so do not destroy the model while the optimizer is still being used.
+///
+/// The optimizer is usually driven by an `ExpansionStrategy`, which decides the order of
+/// label expansions and when to stop.
+///
+/// @tparam T Numeric cost type. Must match the type of the associated `EnergyModel<T>`.
 template <typename T>
 class AlphaExpansion {
 public:
+    /// Factory function that creates a new solver instance.
+    /// @param num_vars   Number of binary variables (active nodes in the expansion subgraph).
+    /// @param num_edges  Estimated number of edges (used for pre-allocation; may be exceeded).
     using SolverFactory = std::function<std::unique_ptr<MaxFlowSolver<T>>(int num_vars, int num_edges)>;
 
+    /// @brief Constructs the optimizer.
+    /// @param model          Energy model to optimize. **Must outlive this object.**
+    /// @param solver_factory Factory used to create a fresh solver for each expansion move.
     AlphaExpansion(EnergyModel<T> &model, SolverFactory solver_factory)
         : model_(model), solver_factory_(std::move(solver_factory)) {
     }
 
+    /// @brief Attempts a single alpha-expansion move for @p alpha_label.
+    ///
+    /// Builds the binary subgraph for @p alpha_label and runs max-flow. If the resulting
+    /// label assignment reduces the total energy, it is applied to the model.
+    ///
+    /// @param alpha_label The label to expand (0 ≤ alpha_label < num_labels).
+    /// @return `true` if any node's label changed and energy decreased; `false` otherwise.
     [[nodiscard]] bool perform_expansion_move(const int alpha_label) const {
         const std::vector<int> active_nodes = model_.get_active_nodes(alpha_label);
         if (active_nodes.empty()) return false;
@@ -53,6 +76,7 @@ public:
     }
 
 private:
+    /// Builds the binary QPBO subgraph for an alpha-expansion move and returns the solver.
     std::unique_ptr<MaxFlowSolver<T>> build_expansion_graph(const int alpha_label, const std::vector<int> &active_nodes,
                                                             std::vector<typename MaxFlowSolver<T>::Var> &node_var_ids) const {
         const int num_active = active_nodes.size();

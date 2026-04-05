@@ -4,12 +4,23 @@
 #include "strategies/ExpansionStrategy.hpp"
 #include <type_traits>
 
+/// @brief Expansion strategy that always picks the label with the greatest energy reduction.
+///
+/// Each cycle evaluates all labels and applies only the expansion move that yields the
+/// largest energy decrease. This is more expensive per cycle than `SequentialStrategy`
+/// (O(K) max-flow solves per cycle instead of one) but may converge in fewer cycles on
+/// some instances.
+///
+/// @tparam T Numeric cost type.
 template <typename T>
 class GreedyStrategy : public ExpansionStrategy<T> {
 public:
-    GreedyStrategy(int max_cycles = 100) : max_cycles_(max_cycles) {
-    }
+    /// @brief Constructs the strategy.
+    /// @param max_cycles Maximum number of greedy cycles before stopping (default: 100).
+    GreedyStrategy(int max_cycles = 100) : max_cycles_(max_cycles) {}
 
+    /// @brief Runs greedy alpha-expansion until convergence or `max_cycles`.
+    /// @return Number of full cycles completed.
     int execute(AlphaExpansion<T> &optimizer, EnergyModel<T> &model) const override {
         int num_labels = model.num_labels();
         int cycle = 0;
@@ -23,7 +34,6 @@ public:
 
             for (int alpha = 0; alpha < num_labels; ++alpha) {
                 model.set_labels(current_labels);
-
                 if (optimizer.perform_expansion_move(alpha)) {
                     T new_energy = model.evaluate_total_energy();
                     bool improved = false;

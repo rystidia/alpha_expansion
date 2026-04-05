@@ -5,7 +5,12 @@
 #include <vector>
 #include <cassert>
 
-// wrapper for the google or-tools max-flow solver
+/// @brief `MaxFlowSolver` backed by Google OR-Tools `SimpleMaxFlow`.
+///
+/// Available only when the library is built with `-DUSE_OR_TOOLS=ON` (the default).
+///
+/// @tparam T Numeric cost type. Note: OR-Tools uses integer arc capacities internally,
+///           so floating-point values get truncated inside the flow network.
 template <typename T>
 class ORToolsSolver : public MaxFlowSolver<T> {
     operations_research::SimpleMaxFlow max_flow_;
