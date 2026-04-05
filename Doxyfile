@@ -1,6 +1,6 @@
 PROJECT_NAME           = "Alpha Expansion Library"
 PROJECT_BRIEF          = "C++ library for the Alpha-Expansion graph-cut algorithm with Python bindings"
-OUTPUT_DIRECTORY       = docs/html
+OUTPUT_DIRECTORY       = docs
 INPUT                  = src/core src/strategies src/solvers docs/guides
 RECURSIVE              = YES
 FILE_PATTERNS          = *.hpp *.md
