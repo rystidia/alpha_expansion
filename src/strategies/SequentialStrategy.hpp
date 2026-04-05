@@ -1,14 +1,15 @@
 #pragma once
 
 #include "core/AlphaExpansion.hpp"
+#include "strategies/ExpansionStrategy.hpp"
 
 template <typename T>
-class SequentialStrategy {
+class SequentialStrategy : public ExpansionStrategy<T> {
 public:
     SequentialStrategy(int max_cycles = 100) : max_cycles_(max_cycles) {
     }
 
-    int execute(AlphaExpansion<T> &optimizer, EnergyModel<T> &model) const {
+    int execute(AlphaExpansion<T> &optimizer, EnergyModel<T> &model) const override {
         int num_labels = model.num_labels();
         int cycle = 0;
         bool converged = false;

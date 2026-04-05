@@ -1,17 +1,18 @@
 #pragma once
 
 #include "core/AlphaExpansion.hpp"
+#include "strategies/ExpansionStrategy.hpp"
 #include <type_traits>
 
 template <typename T>
-class GreedyStrategy {
+class GreedyStrategy : public ExpansionStrategy<T> {
 public:
     GreedyStrategy(int max_cycles = 100) : max_cycles_(max_cycles) {
     }
 
-    int execute(AlphaExpansion<T> &optimizer, EnergyModel<T> &model) const {
+    int execute(AlphaExpansion<T> &optimizer, EnergyModel<T> &model) const override {
         int num_labels = model.num_labels();
-        int cycle = 0; // TODO: calculate cycles
+        int cycle = 0;
         bool converged = false;
 
         while (!converged && cycle < max_cycles_) {

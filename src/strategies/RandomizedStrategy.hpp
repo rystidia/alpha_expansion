@@ -1,18 +1,19 @@
 #pragma once
 
 #include "core/AlphaExpansion.hpp"
+#include "strategies/ExpansionStrategy.hpp"
 #include <vector>
 #include <numeric>
 #include <random>
 #include <algorithm>
 
 template <typename T>
-class RandomizedStrategy {
+class RandomizedStrategy : public ExpansionStrategy<T> {
 public:
     RandomizedStrategy(int max_cycles = 100, unsigned int seed = 42) : max_cycles_(max_cycles), seed_(seed) {
     }
 
-    int execute(AlphaExpansion<T> &optimizer, EnergyModel<T> &model) const {
+    int execute(AlphaExpansion<T> &optimizer, EnergyModel<T> &model) const override {
         int num_labels = model.num_labels();
         int cycle = 0;
         bool converged = false;
