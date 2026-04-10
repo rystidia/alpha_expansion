@@ -1,6 +1,7 @@
 import os
 import sys
 
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QGraphicsView,
     QHBoxLayout,
@@ -10,6 +11,13 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+
+
+class _ResizableView(QGraphicsView):
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if self.scene() and not self.scene().sceneRect().isEmpty():
+            self.fitInView(self.scene().sceneRect(), Qt.AspectRatioMode.KeepAspectRatio)
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "build")))
 import alpha_expansion_py as ae
@@ -71,7 +79,7 @@ class ExpansionApp(QMainWindow):
         self._btn_run.setEnabled(False)
         sidebar.addWidget(self._btn_run)
 
-        self._view = QGraphicsView()
+        self._view = _ResizableView()
         self._view.setMinimumSize(700, 600)
         outer.addLayout(sidebar, 1)
         outer.addWidget(self._view, 4)
@@ -88,6 +96,9 @@ class ExpansionApp(QMainWindow):
         self._moves_without_change = 0
         self._param_layout.addWidget(problem.get_param_widget())
         self._view.setScene(problem.get_scene())
+        problem.get_scene().sceneRectChanged.connect(
+            lambda rect: self._view.fitInView(rect, Qt.AspectRatioMode.KeepAspectRatio)
+        )
         self._btn_seg.setChecked(isinstance(problem, ImageSegmentationProblem))
         self._btn_comm.setChecked(isinstance(problem, CommunityDetectionProblem))
         self._btn_init.setEnabled(True)
