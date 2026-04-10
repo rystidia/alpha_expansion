@@ -90,7 +90,7 @@ and the smoothness weight (lambda) in the dialog that follows.
 
 ### Example Graph Files
 
-`data/graphs/` contains two ready-to-use edge lists:
+`demo/graphs/` contains two ready-to-use edge lists:
 
 | File | Nodes | Edges | Suggested settings |
 |------|-------|-------|--------------------|
