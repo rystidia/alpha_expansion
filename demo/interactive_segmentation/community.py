@@ -8,12 +8,48 @@ import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import networkx as nx
 from PyQt6.QtGui import QImage, QPixmap
-from PyQt6.QtWidgets import QButtonGroup, QGraphicsScene, QPushButton, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import (
+    QButtonGroup,
+    QDialog,
+    QDialogButtonBox,
+    QFileDialog,
+    QFormLayout,
+    QGraphicsScene,
+    QLabel,
+    QMessageBox,
+    QPushButton,
+    QSpinBox,
+    QVBoxLayout,
+    QWidget,
+)
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "build")))
 import alpha_expansion_py as ae
 
 from .problem import Problem
+
+def _auto_seed(G: nx.Graph, num_labels: int) -> dict:
+    """Greedy farthest-point seeding for unseeded graphs.
+
+    Picks num_labels nodes that are maximally spread out in BFS-distance space
+    so the pairwise terms can propagate meaningful community structure outward
+    from each seed.
+    """
+    lengths = dict(nx.all_pairs_shortest_path_length(G))
+    start = max(G.degree(), key=lambda x: x[1])[0]
+    seed_nodes = [start]
+    for _ in range(num_labels - 1):
+        best, best_dist = None, -1
+        for node in G.nodes():
+            if node in seed_nodes:
+                continue
+            d = min(lengths.get(node, {}).get(s, float("inf")) for s in seed_nodes)
+            if d > best_dist:
+                best_dist, best = d, node
+        if best is not None:
+            seed_nodes.append(best)
+    return {node: i for i, node in enumerate(seed_nodes)}
+
 
 _GRAPHS = [
     {
@@ -74,6 +110,15 @@ class CommunityDetectionProblem(Problem):
             self._btn_group.addButton(btn, i)
             layout.addWidget(btn)
         self._btn_group.idClicked.connect(self._select_graph)
+
+        sep = QLabel("— or —")
+        sep.setStyleSheet("color: grey;")
+        layout.addWidget(sep)
+
+        self._btn_custom = QPushButton("Load Custom Graph…")
+        self._btn_custom.clicked.connect(self._load_custom_graph)
+        layout.addWidget(self._btn_custom)
+
         self._param_widget = widget
         return widget
 
@@ -83,6 +128,71 @@ class CommunityDetectionProblem(Problem):
         self._G = G
         self._node_to_idx = {node: i for i, node in enumerate(G.nodes())}
         self._idx_to_node = {i: node for node, i in self._node_to_idx.items()}
+        if hasattr(self, "_btn_custom"):
+            self._btn_custom.setText("Load Custom Graph…")
+        if self._on_graph_selected:
+            self._on_graph_selected()
+
+    def _load_custom_graph(self):
+        file_name, _ = QFileDialog.getOpenFileName(
+            None,
+            "Open Graph File",
+            "",
+            "Graph files (*.edgelist *.txt *.graphml *.gml);;All files (*)",
+        )
+        if not file_name:
+            return
+
+        ext = os.path.splitext(file_name)[1].lower()
+        try:
+            if ext in (".edgelist", ".txt"):
+                G = nx.read_edgelist(file_name)
+            elif ext == ".graphml":
+                G = nx.read_graphml(file_name)
+            elif ext == ".gml":
+                G = nx.read_gml(file_name)
+            else:
+                G = nx.read_edgelist(file_name)
+        except Exception as e:
+            QMessageBox.critical(None, "Error", f"Failed to load graph:\n{e}")
+            return
+
+        dialog = QDialog()
+        dialog.setWindowTitle("Custom Graph Settings")
+        form = QFormLayout(dialog)
+        spin_labels = QSpinBox()
+        spin_labels.setRange(2, 9)
+        spin_labels.setValue(2)
+        spin_lambda = QSpinBox()
+        spin_lambda.setRange(1, 1000)
+        spin_lambda.setValue(10)
+        form.addRow("Number of communities:", spin_labels)
+        form.addRow("Lambda (smoothness):", spin_lambda)
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        )
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+        form.addRow(buttons)
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+
+        checked = self._btn_group.checkedButton()
+        if checked:
+            self._btn_group.setExclusive(False)
+            checked.setChecked(False)
+            self._btn_group.setExclusive(True)
+
+        self._config = {
+            "name": os.path.basename(file_name),
+            "num_labels": spin_labels.value(),
+            "lambda_val": spin_lambda.value(),
+            "seeds": {},
+        }
+        self._G = G
+        self._node_to_idx = {node: i for i, node in enumerate(G.nodes())}
+        self._idx_to_node = {i: node for node, i in self._node_to_idx.items()}
+        self._btn_custom.setText(f"Custom: {os.path.basename(file_name)}")
         if self._on_graph_selected:
             self._on_graph_selected()
 
@@ -97,6 +207,9 @@ class CommunityDetectionProblem(Problem):
         lambda_val = self._config["lambda_val"]
         node_to_idx = self._node_to_idx
         idx_to_node = self._idx_to_node
+
+        if not seeds:
+            seeds = _auto_seed(G, num_labels)
 
         model = ae.EnergyModel(num_nodes, num_labels, "int32")
         for u, v in G.edges():
