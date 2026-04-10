@@ -60,10 +60,47 @@ partition a social network graph into communities.
      and 33 are pre-seeded as the two group leaders.
    - **Les Miserables**: 77-node character co-occurrence network split into 3
      communities. Key characters from each group are pre-seeded.
+   - **Load Custom Graph…**: load your own graph from a file (see below).
 2. Click **Initialize**. The energy model sets high unary costs for seeded nodes
    assigned to the wrong community, and penalizes adjacent nodes in different communities.
+   Custom graphs have no seeds, so the algorithm partitions purely by minimizing
+   the graph cut.
 3. Click **Step** or **Run to Convergence**. After each step the graph renders with
    nodes colored by their current community assignment.
+
+### Loading a Custom Graph
+
+Click **Load Custom Graph…** to open a file dialog, then set the number of communities
+and the smoothness weight (lambda) in the dialog that follows.
+
+**Supported file formats:**
+
+| Format | Extension | Description |
+|--------|-----------|-------------|
+| Edge list | `.edgelist`, `.txt` | One `node1 node2` pair per line; lines starting with `#` are comments |
+| GraphML | `.graphml` | XML-based format exported by Gephi, igraph, and similar tools |
+| GML | `.gml` | Graph Modelling Language, supported by most graph libraries |
+
+**Tuning parameters:**
+
+- **Number of communities** — how many partitions to produce (2–9).
+- **Lambda (smoothness)** — pairwise penalty for placing adjacent nodes in different
+  communities. Higher values push the algorithm toward fewer, larger communities.
+  Start around 10 and adjust if the result is under- or over-segmented.
+
+### Example Graph Files
+
+`data/graphs/` contains two ready-to-use edge lists:
+
+| File | Nodes | Edges | Suggested settings |
+|------|-------|-------|--------------------|
+| `two_cliques.edgelist` | 12 | 31 | 2 communities, lambda 10–20 |
+| `three_cliques.edgelist` | 15 | 33 | 3 communities, lambda 5–15 |
+
+`two_cliques.edgelist` contains two 6-node cliques joined by a single bridge edge —
+the algorithm should recover the two cliques as perfect communities in one step.
+`three_cliques.edgelist` contains three 5-node cliques arranged in a ring, each
+pair connected by one bridge edge.
 
 ## Controls Reference
 
