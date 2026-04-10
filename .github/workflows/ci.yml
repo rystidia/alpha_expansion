@@ -99,3 +99,8 @@ jobs:
       run: |
         cd scripts
         python run_community.py --solver ortools --strategy sequential
+
+    - name: Run Middlebury dataset benchmark
+      run: |
+        cd scripts
+        python run_middlebury.py --solver bk --strategy sequential

@@ -88,14 +88,20 @@ def main():
     cycles = strategy.execute(opt, model)
 
     print(f"Algorithm converged in {cycles} cycles.")
-    print(f"Final energy: {model.evaluate_total_energy()}")
+    final_energy = model.evaluate_total_energy()
+    print(f"Final energy: {final_energy}")
 
     max_label = num_labels - 1
     gt_disparities = np.clip(gt / 16, 0, max_label).astype(np.int32)
     gt_labels_list = gt_disparities.flatten().tolist()
 
     gt_energy = model.evaluate_total_energy_with_labels(gt_labels_list)
-    print(f"Ground Truth energy: {gt_energy}")
+    print(f"Ground truth energy: {gt_energy}")
+
+    if final_energy > gt_energy:
+        print(f"FAIL: final energy ({final_energy}) is worse than ground truth ({gt_energy})")
+        sys.exit(1)
+    print(f"OK: final energy ({final_energy}) <= ground truth energy ({gt_energy})")
 
     labels = np.array(model.get_labels(), dtype=np.uint8).reshape((height, width))
 
