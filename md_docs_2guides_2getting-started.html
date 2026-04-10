@@ -73,8 +73,8 @@ $(function() {
   <div class="headertitle"><div class="title">Getting Started</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md22"></a> </p>
-<h1><a class="anchor" id="autotoc_md23"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md24"></a> </p>
+<h1><a class="anchor" id="autotoc_md25"></a>
 System Requirements</h1>
 <ul>
 <li>CMake &gt;= 3.15</li>
@@ -82,23 +82,23 @@ System Requirements</h1>
 <li>Python development headers (for the Python bindings)</li>
 </ul>
 <div class="fragment"><div class="line">sudo apt-get install -y python3-dev</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md24"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md26"></a>
 Installing OR-Tools (optional)</h1>
 <p>OR-Tools is enabled by default. Download the prebuilt C++ binary for your platform from the <a href="https://github.com/google/or-tools/releases">OR-Tools releases page</a>, then install it:</p>
 <div class="fragment"><div class="line">sudo mkdir -p /opt/ortools</div>
 <div class="line">sudo tar -xzf /path/to/ortools.tar.gz -C /opt/ortools --strip-components=1</div>
 </div><!-- fragment --><p>To build without OR-Tools, pass <code>-DUSE_OR_TOOLS=OFF</code> to CMake (see below).</p>
-<h1><a class="anchor" id="autotoc_md25"></a>
+<h1><a class="anchor" id="autotoc_md27"></a>
 Building</h1>
 <div class="fragment"><div class="line">cmake -B build -S .</div>
 <div class="line">cmake --build build -j$(nproc)</div>
 </div><!-- fragment --><p>CMake finds OR-Tools automatically if it is installed to <code>/opt/ortools</code>. To disable it:</p>
 <div class="fragment"><div class="line">cmake -B build -S . -DUSE_OR_TOOLS=OFF</div>
 <div class="line">cmake --build build -j$(nproc)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md26"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md28"></a>
 Running the Tests</h1>
 <div class="fragment"><div class="line">./build/alpha_expansion_tests</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md27"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md29"></a>
 First Example: C++</h1>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="EnergyModel_8hpp.html">core/EnergyModel.hpp</a>&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;<a class="code" href="AlphaExpansion_8hpp.html">core/AlphaExpansion.hpp</a>&quot;</span></div>
@@ -148,7 +148,7 @@ First Example: C++</h1>
 <div class="ttc" id="aclassAlphaExpansion_html"><div class="ttname"><a href="classAlphaExpansion.html">AlphaExpansion</a></div><div class="ttdoc">Performs alpha-expansion moves on an EnergyModel using a pluggable max-flow solver.</div><div class="ttdef"><b>Definition</b> AlphaExpansion.hpp:20</div></div>
 <div class="ttc" id="aclassEnergyModel_html"><div class="ttname"><a href="classEnergyModel.html">EnergyModel</a></div><div class="ttdoc">Stores the graph and energy costs for the Alpha-Expansion algorithm.</div><div class="ttdef"><b>Definition</b> EnergyModel.hpp:17</div></div>
 <div class="ttc" id="aclassSequentialStrategy_html"><div class="ttname"><a href="classSequentialStrategy.html">SequentialStrategy</a></div><div class="ttdoc">Expansion strategy that cycles through labels in fixed order 0, 1, …, K-1.</div><div class="ttdef"><b>Definition</b> SequentialStrategy.hpp:14</div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md28"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md30"></a>
 First Example: Python</h1>
 <div class="fragment"><div class="line"><span class="keyword">import</span> sys</div>
 <div class="line">sys.path.append(<span class="stringliteral">&#39;build&#39;</span>)          <span class="comment"># make alpha_expansion_py importable</span></div>

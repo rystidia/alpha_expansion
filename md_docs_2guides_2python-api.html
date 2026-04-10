@@ -73,21 +73,21 @@ $(function() {
   <div class="headertitle"><div class="title">Python API</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md33"></a> The Python bindings expose the full C++ API via <a href="https://pybind11.readthedocs.io/">pybind11</a>. After building, the module is available as <code>alpha_expansion_py</code> inside <code>build/</code>.</p>
-<h1><a class="anchor" id="autotoc_md34"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md35"></a> The Python bindings expose the full C++ API via <a href="https://pybind11.readthedocs.io/">pybind11</a>. After building, the module is available as <code>alpha_expansion_py</code> inside <code>build/</code>.</p>
+<h1><a class="anchor" id="autotoc_md36"></a>
 Setup</h1>
 <div class="fragment"><div class="line"><span class="keyword">import</span> sys</div>
 <div class="line">sys.path.append(<span class="stringliteral">&#39;build&#39;</span>)          <span class="comment"># or set PYTHONPATH=build before running</span></div>
 <div class="line"><span class="keyword">import</span> alpha_expansion_py <span class="keyword">as</span> ae</div>
 </div><!-- fragment --><p>You can also add <code>build/</code> to your <code>PYTHONPATH</code> environment variable so you do not need to do this in every script.</p>
-<h1><a class="anchor" id="autotoc_md35"></a>
+<h1><a class="anchor" id="autotoc_md37"></a>
 Creating an Energy Model</h1>
 <p>Use the <code><a class="el" href="classEnergyModel.html" title="Stores the graph and energy costs for the Alpha-Expansion algorithm.">EnergyModel</a></code> factory. It returns the right typed object based on <code>dtype</code>:</p>
 <div class="fragment"><div class="line">model = ae.EnergyModel(num_nodes=100, num_labels=3, dtype=<span class="stringliteral">&#39;int32&#39;</span>)    <span class="comment"># int32_t</span></div>
 <div class="line">model = ae.EnergyModel(num_nodes=100, num_labels=3, dtype=<span class="stringliteral">&#39;float32&#39;</span>)  <span class="comment"># float</span></div>
 <div class="line">model = ae.EnergyModel(num_nodes=100, num_labels=3, dtype=<span class="stringliteral">&#39;float64&#39;</span>)  <span class="comment"># double</span></div>
 </div><!-- fragment --><p>You can also instantiate typed classes directly (<code>ae.EnergyModelInt</code>, <code>ae.EnergyModelFloat</code> or <code>ae.EnergyModelDouble</code>), but the factory is simpler.</p>
-<h1><a class="anchor" id="autotoc_md36"></a>
+<h1><a class="anchor" id="autotoc_md38"></a>
 Setting Costs</h1>
 <p><b>Via callbacks</b> (general graphs, community detection):</p>
 <div class="fragment"><div class="line">model.set_unary_cost_fn(<span class="keyword">lambda</span> node, label: 0 <span class="keywordflow">if</span> seeds.get(node) == label <span class="keywordflow">else</span> 1000)</div>
@@ -100,11 +100,11 @@ Setting Costs</h1>
 </div><!-- fragment --><p><b>Via per-edge weights</b> (Potts model, zero cost for same label and <code>weight</code> otherwise):</p>
 <div class="fragment"><div class="line">model.set_edge_weights(n1s, n2s, weights)  <span class="comment"># three int lists of equal length</span></div>
 </div><!-- fragment --><p>Cost priority: per-edge weights &gt; dense arrays &gt; callbacks.</p>
-<h1><a class="anchor" id="autotoc_md37"></a>
+<h1><a class="anchor" id="autotoc_md39"></a>
 Graph Structure</h1>
 <div class="fragment"><div class="line">model.add_neighbor(0, 1)                       <span class="comment"># single edge</span></div>
 <div class="line">model.add_grid_edges(width=320, height=240)    <span class="comment"># full 4-connected grid</span></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md38"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md40"></a>
 Running Optimization</h1>
 <div class="fragment"><div class="line"><span class="comment"># Typed variants: AlphaExpansionInt, AlphaExpansionFloat, AlphaExpansionDouble</span></div>
 <div class="line">optimizer = ae.AlphaExpansionInt(model, solver_type=<span class="stringliteral">&#39;bk&#39;</span>)  <span class="comment"># or &#39;ortools&#39;</span></div>
@@ -114,7 +114,7 @@ Running Optimization</h1>
 <div class="line"> </div>
 <div class="line">print(model.get_labels())             <span class="comment"># list of ints, one per node</span></div>
 <div class="line">print(model.evaluate_total_energy())  <span class="comment"># final energy value</span></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md39"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md41"></a>
 Available Classes</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -132,7 +132,7 @@ Available Classes</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>RandomizedStrategyInt</code> / <code>Float</code> / <code>Double</code>   </td><td class="markdownTableBodyNone">Random-order strategy   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md40"></a>
+<h1><a class="anchor" id="autotoc_md42"></a>
 Step-by-Step Control</h1>
 <p>You can drive the algorithm one move at a time:</p>
 <div class="fragment"><div class="line">optimizer = ae.AlphaExpansionInt(model, <span class="stringliteral">&#39;bk&#39;</span>)</div>
