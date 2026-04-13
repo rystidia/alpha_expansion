@@ -145,17 +145,19 @@ PYBIND11_MODULE(alpha_expansion_py, m) {
         "    cycles = strategy.execute(optimizer, model)";
 
     bind_types<int32_t>(m, "Int");
+    bind_types<int64_t>(m, "Long");
     bind_types<float>(m, "Float");
     bind_types<double>(m, "Double");
 
     m.def("EnergyModel", [](int num_nodes, int num_labels, const std::string& dtype) -> py::object {
         if (dtype == "int32") return py::cast(EnergyModel<int32_t>(num_nodes, num_labels));
+        if (dtype == "int64") return py::cast(EnergyModel<int64_t>(num_nodes, num_labels));
         if (dtype == "float32") return py::cast(EnergyModel<float>(num_nodes, num_labels));
         if (dtype == "float64") return py::cast(EnergyModel<double>(num_nodes, num_labels));
-        throw std::invalid_argument("dtype must be 'int32', 'float32', or 'float64'");
+        throw std::invalid_argument("dtype must be 'int32', 'int64', 'float32', or 'float64'");
     }, py::arg("num_nodes"), py::arg("num_labels"), py::arg("dtype") = "int32",
     "Create an EnergyModel of the given dtype.\n\n"
     ":param num_nodes: Number of nodes.\n"
     ":param num_labels: Number of labels.\n"
-    ":param dtype: One of ``'int32'`` (default), ``'float32'``, ``'float64'``.");
+    ":param dtype: One of ``'int32'`` (default), ``'int64'``, ``'float32'``, ``'float64'``.");
 }

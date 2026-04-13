@@ -11,7 +11,7 @@
 /// **License note:** The underlying BK implementation is restricted to non-commercial,
 /// research use only. See the project README for details.
 ///
-/// @tparam T Numeric cost type (`int32_t`, `float`, or `double`).
+/// @tparam T Numeric cost type (`int32_t`, `int64_t`, `float`, or `double`).
 template <typename T>
 class BKSolver : public MaxFlowSolver<T> {
     typedef Energy<T, T, T> EnergyT;
