@@ -13,6 +13,7 @@
 #include <memory>
 #include <tuple>
 #include <string>
+#include <cstdint>
 
 enum class SolverType { BK, ORTools };
 enum class StrategyType { Sequential, Greedy, Randomized };
@@ -89,6 +90,7 @@ void run_Test2DGridDenosing(SolverType solver_type, StrategyType strategy_type) 
 TEST_P(AlphaExpansionTest, Test2DGridDenosingMRF) {
     auto params = GetParam();
     run_Test2DGridDenosing<int>(std::get<0>(params), std::get<1>(params));
+    run_Test2DGridDenosing<int64_t>(std::get<0>(params), std::get<1>(params));
     run_Test2DGridDenosing<float>(std::get<0>(params), std::get<1>(params));
     run_Test2DGridDenosing<double>(std::get<0>(params), std::get<1>(params));
 }
@@ -124,6 +126,7 @@ void run_TwoPixelTrap_StartsAt_0_0(SolverType solver_type, StrategyType strategy
 TEST_P(AlphaExpansionTest, TwoPixelTrap_StartsAt_0_0) {
     auto params = GetParam();
     run_TwoPixelTrap_StartsAt_0_0<int>(std::get<0>(params), std::get<1>(params));
+    run_TwoPixelTrap_StartsAt_0_0<int64_t>(std::get<0>(params), std::get<1>(params));
     run_TwoPixelTrap_StartsAt_0_0<float>(std::get<0>(params), std::get<1>(params));
     run_TwoPixelTrap_StartsAt_0_0<double>(std::get<0>(params), std::get<1>(params));
 }
@@ -159,6 +162,7 @@ void run_TwoPixelTrap_StartsAt_0_1(SolverType solver_type, StrategyType strategy
 TEST_P(AlphaExpansionTest, TwoPixelTrap_StartsAt_0_1) {
     auto params = GetParam();
     run_TwoPixelTrap_StartsAt_0_1<int>(std::get<0>(params), std::get<1>(params));
+    run_TwoPixelTrap_StartsAt_0_1<int64_t>(std::get<0>(params), std::get<1>(params));
     run_TwoPixelTrap_StartsAt_0_1<float>(std::get<0>(params), std::get<1>(params));
     run_TwoPixelTrap_StartsAt_0_1<double>(std::get<0>(params), std::get<1>(params));
 }
@@ -202,6 +206,7 @@ void run_TestManyCycles2(SolverType solver_type, StrategyType strategy_type) {
 TEST_P(AlphaExpansionTest, TestManyCycles2) {
     auto params = GetParam();
     run_TestManyCycles2<int>(std::get<0>(params), std::get<1>(params));
+    run_TestManyCycles2<int64_t>(std::get<0>(params), std::get<1>(params));
     run_TestManyCycles2<float>(std::get<0>(params), std::get<1>(params));
     run_TestManyCycles2<double>(std::get<0>(params), std::get<1>(params));
 }
@@ -297,6 +302,7 @@ void run_TestSnakeMRF(SolverType solver_type, StrategyType strategy_type) {
 TEST_P(AlphaExpansionTest, TestSnakeMRF) {
     auto params = GetParam();
     run_TestSnakeMRF<int>(std::get<0>(params), std::get<1>(params));
+    run_TestSnakeMRF<int64_t>(std::get<0>(params), std::get<1>(params));
     run_TestSnakeMRF<float>(std::get<0>(params), std::get<1>(params));
     run_TestSnakeMRF<double>(std::get<0>(params), std::get<1>(params));
 }
