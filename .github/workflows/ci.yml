@@ -90,17 +90,32 @@ jobs:
     - name: Run pytest
       run: python -m pytest tests/ -v
 
-    - name: Run Python Community Detection Script
+    - name: Run community detection (bk, sequential)
       run: |
         cd scripts
         python run_community.py --solver bk --strategy sequential
 
-    - name: Verify OR-Tools Python execution
+    - name: Run community detection (bk, greedy)
+      run: |
+        cd scripts
+        python run_community.py --solver bk --strategy greedy
+
+    - name: Run community detection (bk, randomized)
+      run: |
+        cd scripts
+        python run_community.py --solver bk --strategy randomized
+
+    - name: Run community detection (ortools, sequential)
       run: |
         cd scripts
         python run_community.py --solver ortools --strategy sequential
 
-    - name: Run Middlebury dataset benchmark
+    - name: Run Middlebury benchmark (bk, sequential)
       run: |
         cd scripts
         python run_middlebury.py --solver bk --strategy sequential
+
+    - name: Run Middlebury benchmark (ortools, sequential)
+      run: |
+        cd scripts
+        python run_middlebury.py --solver ortools --strategy sequential
