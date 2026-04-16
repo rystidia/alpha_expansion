@@ -59,7 +59,7 @@ TEST(EnergyModelTest, PairwiseCostCallback) {
 }
 
 TEST(EnergyModelTest, PairwiseCostDenseMatrix) {
-    EnergyModel<int> model(2, 3)
+    EnergyModel<int> model(2, 3);
     model.set_pairwise_costs({0, 5, 5, 5, 0, 5, 5, 5, 0});
     EXPECT_EQ(model.get_pairwise_cost(0, 1, 0, 0), 0);
     EXPECT_EQ(model.get_pairwise_cost(0, 1, 1, 2), 5);
