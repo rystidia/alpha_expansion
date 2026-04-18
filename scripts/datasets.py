@@ -46,6 +46,44 @@ def add_noise(image: np.ndarray, sigma: float, seed: int = 0) -> np.ndarray:
 
 _GC_BASE = "https://raw.githubusercontent.com/anmolagarwal999/GrabCut-based-Image-Segmentation/master"
 
+_MB2001 = "https://vision.middlebury.edu/stereo/data/scenes2001/data"
+_MB2003 = "https://vision.middlebury.edu/stereo/data/scenes2003/newdata"
+
+MIDDLEBURY_STEREO = {
+    "venus": (
+        f"{_MB2001}/venus/im2.ppm",
+        f"{_MB2001}/venus/im6.ppm",
+        f"{_MB2001}/venus/disp2.pgm",
+        8,
+    ),
+    "cones": (
+        f"{_MB2003}/cones/im2.png",
+        f"{_MB2003}/cones/im6.png",
+        f"{_MB2003}/cones/disp2.png",
+        4,
+    ),
+}
+
+def load_middlebury_stereo(name: str):
+    """Returns (left, right, gt, disparity_scale) as float32/uint arrays."""
+    if name == "tsukuba":
+        from ci_data import load_tsukuba
+        left, right, gt = load_tsukuba()
+        return left, right, gt, 16
+    if name not in MIDDLEBURY_STEREO:
+        raise KeyError(f"unknown scene: {name}; choices: tsukuba, {list(MIDDLEBURY_STEREO)}")
+    left_url, right_url, gt_url, scale = MIDDLEBURY_STEREO[name]
+    ext = left_url.rsplit(".", 1)[-1]
+    left_path = _download(left_url, os.path.join(ROOT, "data", name, f"left.{ext}"))
+    right_path = _download(right_url, os.path.join(ROOT, "data", name, f"right.{ext}"))
+    gt_ext = gt_url.rsplit(".", 1)[-1]
+    gt_path = _download(gt_url, os.path.join(ROOT, "data", name, f"gt.{gt_ext}"))
+    left = np.array(Image.open(left_path)).astype(np.float32)
+    right = np.array(Image.open(right_path)).astype(np.float32)
+    gt = np.array(Image.open(gt_path))
+    return left, right, gt, scale
+
+
 GRABCUT_IMAGES = {
     "flower": (
         f"{_GC_BASE}/images/flower.jpg",
