@@ -16,7 +16,7 @@ def parse_args():
     p.add_argument("--sizes", default="10,20,40,80,160")
     p.add_argument("--strategies", default="sequential,greedy,randomized")
     p.add_argument("--solvers", default="bk")
-    p.add_argument("--max-cycles", type=int, default=2000)
+    p.add_argument("--max-cycles", type=int, default=100000)
     p.add_argument("--no-plot", action="store_true")
     return p.parse_args()
 
