@@ -93,22 +93,22 @@ jobs:
     - name: Run community detection (bk, sequential)
       run: |
         cd scripts
-        python run_community.py --solver bk --strategy sequential
+        python run_community.py --datasets karate,lesmis --solver bk --strategy sequential --init zero
 
     - name: Run community detection (bk, greedy)
       run: |
         cd scripts
-        python run_community.py --solver bk --strategy greedy
+        python run_community.py --datasets karate,lesmis --solver bk --strategy greedy --init zero
 
     - name: Run community detection (bk, randomized)
       run: |
         cd scripts
-        python run_community.py --solver bk --strategy randomized
+        python run_community.py --datasets karate,lesmis --solver bk --strategy randomized --init zero
 
     - name: Run community detection (ortools, sequential)
       run: |
         cd scripts
-        python run_community.py --solver ortools --strategy sequential
+        python run_community.py --datasets karate,lesmis --solver ortools --strategy sequential --init zero
 
     - name: Run Middlebury benchmark (bk, sequential)
       run: |

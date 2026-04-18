@@ -114,3 +114,32 @@ def load_segmentation_image(name: str):
     rgb = np.array(Image.open(img_path).convert("RGB"))
     gt  = np.array(Image.open(mask_path).convert("L"))
     return rgb, gt, bbox
+
+
+
+COMMUNITY_GRAPHS = {
+    "football": "http://www-personal.umich.edu/~mejn/netdata/football.zip",
+}
+
+
+def load_community_graph(name: str):
+    import networkx as nx
+    if name == "karate":
+        return nx.karate_club_graph()
+    if name == "lesmis":
+        return nx.les_miserables_graph()
+    if name not in COMMUNITY_GRAPHS:
+        raise KeyError(f"unknown graph: {name}; choices: karate, lesmis, {list(COMMUNITY_GRAPHS)}")
+    import zipfile, io, urllib.request
+    url = COMMUNITY_GRAPHS[name]
+    cache_path = os.path.join(ROOT, "data", "community", f"{name}.gml")
+    if not os.path.exists(cache_path):
+        os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+        print(f"downloading {url}")
+        with urllib.request.urlopen(url) as r:
+            with zipfile.ZipFile(io.BytesIO(r.read())) as z:
+                gml_name = next(n for n in z.namelist() if n.endswith(".gml"))
+                with z.open(gml_name) as f:
+                    with open(cache_path, "wb") as out:
+                        out.write(f.read())
+    return nx.read_gml(cache_path, label="id")
