@@ -115,6 +115,42 @@ def init_partial_optimum(model, optimum, fraction: float, seed: int = 0):
     return labels
 
 
+def build_restoration_model(noisy: np.ndarray, num_labels: int, lambda_smooth: int):
+    h, w = noisy.shape
+    levels = np.linspace(0, 255, num_labels).astype(np.float32)
+    diff = noisy.astype(np.float32)[..., None] - levels[None, None, :]
+    unary = (diff * diff).astype(np.int32)
+    model = ae.EnergyModel(h * w, num_labels, "int32")
+    model.set_unary_costs(unary.flatten().tolist())
+    pairwise = np.full((num_labels, num_labels), lambda_smooth, dtype=np.int32)
+    np.fill_diagonal(pairwise, 0)
+    model.set_pairwise_costs(pairwise.flatten().tolist())
+    model.add_grid_edges(w, h)
+    return model, levels
+
+
+def build_stereo_model(left: np.ndarray, right: np.ndarray, num_labels: int,
+                       lambda_smooth: int = 20, max_unary: int = 50):
+    left = left.astype(np.int32)
+    right = right.astype(np.int32)
+    h, w = left.shape[:2]
+    model = ae.EnergyModel(h * w, num_labels, "int32")
+    model.add_grid_edges(w, h)
+    pairwise = np.full((num_labels, num_labels), lambda_smooth, dtype=np.int32)
+    np.fill_diagonal(pairwise, 0)
+    model.set_pairwise_costs(pairwise.flatten().tolist())
+    unary = np.full((h, w, num_labels), 1000, dtype=np.int32)
+    for d in range(num_labels):
+        if d == 0:
+            diff = np.sum(np.abs(left - right), axis=2)
+            unary[:, :, d] = np.minimum(diff, max_unary)
+        else:
+            diff = np.sum(np.abs(left[:, d:] - right[:, :-d]), axis=2)
+            unary[:, d:, d] = np.minimum(diff, max_unary)
+    model.set_unary_costs(unary.flatten().tolist())
+    return model
+
+
 def make_strategy(name: str, max_cycles: int = 100):
     if name == "sequential":
         return ae.SequentialStrategyInt(max_cycles)

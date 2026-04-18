@@ -3,7 +3,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "scripts")))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "build")))
 
-from experiments import build_chain, build_checkerboard, build_snake
+import numpy as np
+from experiments import build_chain, build_checkerboard, build_snake, build_restoration_model, build_stereo_model
 
 
 def test_chain_size_matches():
@@ -27,3 +28,19 @@ def test_checkerboard_size_matches():
 def test_snake_size_matches():
     model, optimum = build_snake(side=4)
     assert model.num_nodes == 16
+
+
+def test_build_restoration_model_small():
+    noisy = np.full((4, 4), 128, dtype=np.uint8)
+    model, levels = build_restoration_model(noisy, num_labels=4, lambda_smooth=10)
+    assert model.num_nodes == 16
+    assert model.num_labels == 4
+    assert len(levels) == 4
+
+
+def test_build_stereo_model_small():
+    left = np.zeros((4, 8, 3), dtype=np.float32)
+    right = np.zeros((4, 8, 3), dtype=np.float32)
+    model = build_stereo_model(left, right, num_labels=4)
+    assert model.num_nodes == 32
+    assert model.num_labels == 4

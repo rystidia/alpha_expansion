@@ -4,7 +4,7 @@ from PIL import Image
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from datasets import load_restoration_image, add_noise
-from experiments import run_one
+from experiments import build_restoration_model, run_one
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build")))
 import alpha_expansion_py as ae
 
@@ -16,18 +16,6 @@ def psnr(a: np.ndarray, b: np.ndarray) -> float:
     return 99.0 if mse == 0.0 else 10.0 * np.log10(255.0 ** 2 / mse)
 
 
-def build_model(noisy: np.ndarray, num_labels: int, lambda_smooth: int):
-    h, w = noisy.shape
-    levels = np.linspace(0, 255, num_labels).astype(np.float32)
-    diff = noisy.astype(np.float32)[..., None] - levels[None, None, :]
-    unary = (diff * diff).astype(np.int32)
-    model = ae.EnergyModel(h * w, num_labels, "int32")
-    model.set_unary_costs(unary.flatten().tolist())
-    pairwise = np.full((num_labels, num_labels), lambda_smooth, dtype=np.int32)
-    np.fill_diagonal(pairwise, 0)
-    model.set_pairwise_costs(pairwise.flatten().tolist())
-    model.add_grid_edges(w, h)
-    return model, levels
 
 
 def parse_args():
@@ -58,7 +46,7 @@ def main():
         best_restored, best_psnr = None, -1.0
         for strategy in args.strategies.split(","):
             for solver in args.solvers.split(","):
-                model, levels = build_model(noisy, args.num_labels, args.lambda_smooth)
+                model, levels = build_restoration_model(noisy, args.num_labels, args.lambda_smooth)
                 res = run_one(model, strategy, solver, args.max_cycles)
                 labels = np.array(model.get_labels()).reshape(noisy.shape)
                 restored = levels[labels].astype(np.uint8)

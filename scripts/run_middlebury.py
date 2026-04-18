@@ -10,29 +10,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "b
 
 import alpha_expansion_py as ae
 from ci_data import load_tsukuba
+from experiments import build_stereo_model
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 
-def build_model(left, right, num_labels, lambda_smooth=20, max_unary=50):
-    left = left.astype(np.int32)
-    right = right.astype(np.int32)
-    h, w = left.shape[:2]
-    model = ae.EnergyModel(h * w, num_labels, "int32")
-    model.add_grid_edges(w, h)
-    pairwise = np.full((num_labels, num_labels), lambda_smooth, dtype=np.int32)
-    np.fill_diagonal(pairwise, 0)
-    model.set_pairwise_costs(pairwise.flatten().tolist())
-    unary = np.full((h, w, num_labels), 1000, dtype=np.int32)
-    for d in range(num_labels):
-        if d == 0:
-            diff = np.sum(np.abs(left - right), axis=2)
-            unary[:, :, d] = np.minimum(diff, max_unary)
-        else:
-            diff = np.sum(np.abs(left[:, d:] - right[:, :-d]), axis=2)
-            unary[:, d:, d] = np.minimum(diff, max_unary)
-    model.set_unary_costs(unary.flatten().tolist())
-    return model
 
 
 def main():
@@ -59,7 +41,7 @@ def main():
     height, width = left.shape[:2]
     print(f"Scene: {args.scene}  size: {width}x{height}  labels: {num_labels}")
 
-    model = build_model(left, right, num_labels)
+    model = build_stereo_model(left, right, num_labels)
 
     print(f"Initial energy: {model.evaluate_total_energy()}")
     print(f"Running Alpha Expansion ({args.solver}, {args.strategy})")
