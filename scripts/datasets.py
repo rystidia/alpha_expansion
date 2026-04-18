@@ -43,3 +43,36 @@ def add_noise(image: np.ndarray, sigma: float, seed: int = 0) -> np.ndarray:
     rng = np.random.default_rng(seed)
     noisy = image.astype(np.float32) + rng.normal(0.0, sigma, image.shape)
     return np.clip(noisy, 0, 255).astype(np.uint8)
+
+_GC_BASE = "https://raw.githubusercontent.com/anmolagarwal999/GrabCut-based-Image-Segmentation/master"
+
+GRABCUT_IMAGES = {
+    "flower": (
+        f"{_GC_BASE}/images/flower.jpg",
+        f"{_GC_BASE}/ground_truth/flower.bmp",
+        (139, 77, 319, 313),
+    ),
+    "teddy": (
+        f"{_GC_BASE}/images/teddy.jpg",
+        f"{_GC_BASE}/ground_truth/teddy.bmp",
+        (59, 53, 172, 279),
+    ),
+    "llama": (
+        f"{_GC_BASE}/images/llama.jpg",
+        f"{_GC_BASE}/ground_truth/llama.bmp",
+        (110, 102, 255, 268),
+    ),
+}
+
+
+def load_segmentation_image(name: str):
+    if name not in GRABCUT_IMAGES:
+        raise KeyError(name)
+    img_url, mask_url, bbox = GRABCUT_IMAGES[name]
+    img_path  = os.path.join(ROOT, "data", "segmentation", f"{name}.jpg")
+    mask_path = os.path.join(ROOT, "data", "segmentation", f"{name}_gt.bmp")
+    _download(img_url, img_path)
+    _download(mask_url, mask_path)
+    rgb = np.array(Image.open(img_path).convert("RGB"))
+    gt  = np.array(Image.open(mask_path).convert("L"))
+    return rgb, gt, bbox
