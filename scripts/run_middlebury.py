@@ -7,7 +7,7 @@ from PIL import Image
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "build")))
 
 import alpha_expansion_py as ae
-from load_dataset import load_tsukuba
+from ci_data import load_tsukuba
 
 
 def main():
