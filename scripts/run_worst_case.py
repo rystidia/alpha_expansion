@@ -59,25 +59,45 @@ def main():
 
 
 def _plot(rows):
+    import numpy as np
     import matplotlib.pyplot as plt
     plot_dir = os.path.join(ROOT, "data", "plots", "worst_case")
     os.makedirs(plot_dir, exist_ok=True)
+
+    # reference exponent and label per instance
+    ref_exp = {"chain": 1.0, "checkerboard": 0.5, "snake": 1.0}
+    ref_label = {"chain": "O(n)", "checkerboard": "O(√n)", "snake": "O(n)"}
+
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
     for ax, instance in zip(axes, ["chain", "checkerboard", "snake"]):
+        all_xs = []
         for strategy in sorted({r["strategy"] for r in rows}):
             xs, ys = [], []
             for r in rows:
                 if r["instance"] == instance and r["strategy"] == strategy:
-                    n = r["size"] if instance == "chain" else r["size"] ** 2
-                    xs.append(n); ys.append(r["cycles"])
+                    n = int(r["size"]) if instance == "chain" else int(r["size"]) ** 2
+                    xs.append(n); ys.append(int(r["moves_applied"]))
+            xs, ys = zip(*sorted(zip(xs, ys)))
             ax.loglog(xs, ys, "o-", label=strategy)
+            all_xs.extend(xs)
+
+        # reference line anchored to the midpoint of the data
+        ns = np.array(sorted(set(all_xs)), dtype=float)
+        mid = ns[len(ns) // 2]
+        mid_y = np.median([int(r["moves_applied"]) for r in rows
+                           if r["instance"] == instance and
+                           (int(r["size"]) if instance == "chain" else int(r["size"])**2) == int(mid)])
+        exp = ref_exp[instance]
+        ref_ys = mid_y * (ns / mid) ** exp
+        ax.loglog(ns, ref_ys, "--", color="gray", linewidth=1.2, label=ref_label[instance])
+
         ax.set_title(instance)
         ax.set_xlabel("n (nodes)")
-        ax.set_ylabel("cycles to converge")
+        ax.set_ylabel("moves applied")
         ax.grid(True, which="both", alpha=0.3)
         ax.legend()
     fig.tight_layout()
-    out = os.path.join(plot_dir, "cycles_vs_size.png")
+    out = os.path.join(plot_dir, "moves_vs_size.png")
     fig.savefig(out, dpi=120)
     print(f"wrote {out}")
 
