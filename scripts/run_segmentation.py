@@ -115,7 +115,7 @@ def main():
                       f"cycles={res['cycles']:3} IoU={score:.3f}")
         comparison_data.append((name, rgb, gt, best_mask, best_iou, bbox))
 
-    cols = ["image", "strategy", "solver", "cycles", "moves_applied",
+    cols = ["image", "strategy", "solver", "cycles", "moves_attempted",
             "initial_energy", "final_energy", "wall_seconds", "iou"]
     with open(os.path.join(out_dir, "results.csv"), "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=cols)

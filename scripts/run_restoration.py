@@ -64,7 +64,7 @@ def main():
         comparison_data.append((name, clean, noisy, best_restored, best_psnr))
 
     csv_path = os.path.join(out_dir, "results.csv")
-    cols = ["image", "strategy", "solver", "cycles", "moves_applied",
+    cols = ["image", "strategy", "solver", "cycles", "moves_attempted",
             "initial_energy", "final_energy", "wall_seconds",
             "psnr_noisy", "psnr_restored"]
     with open(csv_path, "w", newline="") as f:

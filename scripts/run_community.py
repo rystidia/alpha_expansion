@@ -101,7 +101,8 @@ def run_one_dataset(name, G, config, args):
 
     return {"dataset": name, "solver": args.solver, "strategy": args.strategy,
             "nodes": num_nodes, "edges": G.number_of_edges(),
-            "cycles": cycles, "final_energy": final_energy}
+            "cycles": cycles, "final_energy": final_energy,
+            "labels": labels, "node_to_idx": node_to_idx}
 
 
 def parse_args():
@@ -135,26 +136,13 @@ def main():
             w = csv.DictWriter(f, fieldnames=cols)
             w.writeheader()
             for r in rows:
-                w.writerow(r)
+                w.writerow({k: r[k] for k in cols})
         print(f"\nwrote {args.output_csv}")
 
 
 def _visualize(name, G, row, config, args):
-    num_nodes = G.number_of_nodes()
-    node_to_idx = {node: i for i, node in enumerate(G.nodes())}
-    model = ae.EnergyModel(num_nodes, config["num_labels"], "int32")
-    for u, v in G.edges():
-        model.add_neighbor(node_to_idx[u], node_to_idx[v])
-    seeds = config["seeds"]
-    idx_to_node = {i: node for node, i in node_to_idx.items()}
-    model.set_unary_cost_fn(
-        lambda idx, label: (0 if label == seeds[idx_to_node[idx]] else 1000)
-        if idx_to_node[idx] in seeds else 0)
-    model.set_pairwise_cost_fn(
-        lambda n1, n2, l1, l2: 0 if l1 == l2 else config["lambda_val"])
-    opt = ae.AlphaExpansionInt(model, args.solver)
-    ae.SequentialStrategyInt(args.max_cycles).execute(opt, model)
-    labels = model.get_labels()
+    labels = row["labels"]
+    node_to_idx = row["node_to_idx"]
     plt.figure(figsize=(12, 10))
     try:
         from networkx.drawing.nx_pydot import graphviz_layout

@@ -46,7 +46,7 @@ def main():
                           f"cycles={res['cycles']:4} E={res['final_energy']}")
 
     cols = ["instance", "size", "strategy", "solver",
-            "cycles", "moves_applied", "initial_energy", "final_energy", "wall_seconds"]
+            "cycles", "moves_attempted", "initial_energy", "final_energy", "wall_seconds"]
     with open(csv_path, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=cols)
         w.writeheader()
@@ -76,15 +76,19 @@ def _plot(rows):
             for r in rows:
                 if r["instance"] == instance and r["strategy"] == strategy:
                     n = int(r["size"]) if instance == "chain" else int(r["size"]) ** 2
-                    xs.append(n); ys.append(int(r["moves_applied"]))
+                    xs.append(n); ys.append(int(r["moves_attempted"]))
+            if not xs:
+                continue
             xs, ys = zip(*sorted(zip(xs, ys)))
             ax.loglog(xs, ys, "o-", label=strategy)
             all_xs.extend(xs)
 
-        # reference line anchored to the midpoint of the data
+        if not all_xs:
+            ax.set_title(instance)
+            continue
         ns = np.array(sorted(set(all_xs)), dtype=float)
         mid = ns[len(ns) // 2]
-        mid_y = np.median([int(r["moves_applied"]) for r in rows
+        mid_y = np.median([int(r["moves_attempted"]) for r in rows
                            if r["instance"] == instance and
                            (int(r["size"]) if instance == "chain" else int(r["size"])**2) == int(mid)])
         exp = ref_exp[instance]
@@ -93,7 +97,7 @@ def _plot(rows):
 
         ax.set_title(instance)
         ax.set_xlabel("n (nodes)")
-        ax.set_ylabel("moves applied")
+        ax.set_ylabel("moves attempted")
         ax.grid(True, which="both", alpha=0.3)
         ax.legend()
     fig.tight_layout()

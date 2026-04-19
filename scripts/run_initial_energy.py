@@ -3,6 +3,8 @@ import csv
 import os
 import sys
 
+import numpy as np
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from experiments import (
     build_chain, build_checkerboard, build_snake,
@@ -69,7 +71,6 @@ def _build_real_model(name: str):
 
 
 def _proxy_optimum(model, solver: str, max_cycles: int) -> list:
-    import copy
     labels = init_zero(model)
     model.set_labels(labels)
     run_one(model, "sequential", solver, max_cycles)
@@ -101,7 +102,7 @@ def main():
 
     csv_path = os.path.join(out_dir, "artificial.csv")
     cols = ["instance", "size", "init", "strategy", "seed",
-            "cycles", "moves_applied", "initial_energy", "final_energy", "wall_seconds"]
+            "cycles", "moves_attempted", "initial_energy", "final_energy", "wall_seconds"]
     with open(csv_path, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=cols)
         w.writeheader()
@@ -110,14 +111,14 @@ def main():
     print(f"wrote {csv_path}")
 
     if not args.no_trajectory:
-        _scatter_plots(rows)
+        _scatter_plots(rows, key="instance", out_dir=DEFAULT_PLOTS)
         _trajectory_plots(args)
 
 
 def _main_real(args, out_dir):
     rows = []
     cols = ["dataset", "init", "strategy", "seed",
-            "cycles", "moves_applied", "initial_energy", "final_energy", "wall_seconds"]
+            "cycles", "moves_attempted", "initial_energy", "final_energy", "wall_seconds"]
     for name in args.datasets.split(","):
         proxy = _proxy_optimum(_build_real_model(name), args.solver, args.max_cycles)
         for init in args.inits.split(","):
@@ -149,81 +150,75 @@ def _main_real(args, out_dir):
     print(f"wrote {csv_path}")
 
     if not args.no_trajectory:
-        _scatter_plots_real(rows, out_dir)
+        _scatter_plots(rows, key="dataset", out_dir=os.path.join(DEFAULT_PLOTS, "real"))
 
 
-def _scatter_plots_real(rows, out_dir):
+def _scatter_plots(rows, key, out_dir):
     import matplotlib.pyplot as plt
-    plot_dir = os.path.join(DEFAULT_PLOTS, "real")
-    os.makedirs(plot_dir, exist_ok=True)
-    for name in {r["dataset"] for r in rows}:
+    os.makedirs(out_dir, exist_ok=True)
+    for group in {r[key] for r in rows}:
         fig, ax = plt.subplots(figsize=(7.5, 5))
-        for init in sorted({r["init"] for r in rows if r["dataset"] == name}):
+        for init in sorted({r["init"] for r in rows if r[key] == group}):
             xs = [r["initial_energy"] for r in rows
-                  if r["dataset"] == name and r["init"] == init]
-            ys = [r["moves_applied"] for r in rows
-                  if r["dataset"] == name and r["init"] == init]
+                  if r[key] == group and r["init"] == init]
+            ys = [r["moves_attempted"] for r in rows
+                  if r[key] == group and r["init"] == init]
             ax.scatter(xs, ys, label=init, alpha=0.7)
         ax.set_xlabel("initial energy")
-        ax.set_ylabel("moves applied")
-        ax.set_title(f"{name}: moves applied vs initial energy")
+        ax.set_ylabel("moves attempted")
+        ax.set_title(f"{group}: moves attempted vs initial energy")
         ax.legend()
         ax.grid(alpha=0.3)
-        out = os.path.join(plot_dir, f"{name}_scatter.png")
+        out = os.path.join(out_dir, f"{group}_scatter.png")
         fig.tight_layout()
         fig.savefig(out, dpi=120)
         plt.close(fig)
         print(f"wrote {out}")
 
 
-def _scatter_plots(rows):
-    import matplotlib.pyplot as plt
-    os.makedirs(DEFAULT_PLOTS, exist_ok=True)
-    for instance in {r["instance"] for r in rows}:
-        fig, ax = plt.subplots(figsize=(7.5, 5))
-        for init in sorted({r["init"] for r in rows if r["instance"] == instance}):
-            xs = [r["initial_energy"] for r in rows
-                  if r["instance"] == instance and r["init"] == init]
-            ys = [r["moves_applied"] for r in rows
-                  if r["instance"] == instance and r["init"] == init]
-            ax.scatter(xs, ys, label=init, alpha=0.7)
-        ax.set_xlabel("initial energy")
-        ax.set_ylabel("moves applied")
-        ax.set_title(f"{instance}: moves applied vs initial energy")
-        ax.legend()
-        ax.grid(alpha=0.3)
-        out = os.path.join(DEFAULT_PLOTS, f"{instance}_scatter.png")
-        fig.tight_layout()
-        fig.savefig(out, dpi=120)
-        plt.close(fig)
-        print(f"wrote {out}")
+def _alpha_sequence(strategy, num_labels, max_cycles, seed):
+    if strategy == "sequential":
+        for _ in range(max_cycles):
+            for a in range(num_labels):
+                yield a
+    elif strategy == "randomized":
+        rng = np.random.default_rng(seed)
+        for _ in range(max_cycles):
+            for a in rng.permutation(num_labels):
+                yield int(a)
+    else:
+        raise ValueError(f"trajectory plot does not support strategy {strategy}")
 
 
 def _trajectory_plots(args):
     import matplotlib.pyplot as plt
     os.makedirs(DEFAULT_PLOTS, exist_ok=True)
+    supported = [s for s in args.strategies.split(",") if s in {"sequential", "randomized"}]
+    if not supported:
+        return
     for instance in args.instances.split(","):
         builder = INSTANCE_BUILDERS[instance]
         fig, ax = plt.subplots(figsize=(7.5, 5))
         for init in args.inits.split(","):
-            model, optimum = builder(args.size)
-            labels = make_init(init, model, optimum, seed=0)
-            model.set_labels(labels)
-            optimizer = ae.AlphaExpansionInt(model, args.solver)
-            energies = [model.evaluate_total_energy()]
-            for _ in range(args.max_cycles):
-                changed = False
-                for alpha in range(model.num_labels):
-                    if optimizer.perform_expansion_move(alpha):
-                        changed = True
+            for strategy in supported:
+                model, optimum = builder(args.size)
+                labels = make_init(init, model, optimum, seed=0)
+                model.set_labels(labels)
+                optimizer = ae.AlphaExpansionInt(model, args.solver)
+                energies = [model.evaluate_total_energy()]
+                step = 0
+                for alpha in _alpha_sequence(strategy, model.num_labels, args.max_cycles, seed=0):
+                    optimizer.perform_expansion_move(alpha)
                     energies.append(model.evaluate_total_energy())
-                if not changed:
-                    break
-            ax.plot(energies, label=init)
+                    step += 1
+                    if step % model.num_labels == 0:
+                        if energies[-1] == energies[-1 - model.num_labels]:
+                            break
+                ax.plot(energies, label=f"{init} / {strategy}")
         ax.set_xlabel("alpha-move")
         ax.set_ylabel("total energy")
         ax.set_title(f"{instance}: energy trajectory")
-        ax.legend()
+        ax.legend(fontsize=8)
         ax.grid(alpha=0.3)
         out = os.path.join(DEFAULT_PLOTS, f"{instance}_trajectory.png")
         fig.tight_layout()

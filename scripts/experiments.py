@@ -172,12 +172,12 @@ def run_one(model, strategy_name: str, solver_name: str, max_cycles: int = 100,
     cycles = strategy.execute(optimizer, model)
     elapsed = time.perf_counter() - t0
     if strategy_name == "greedy":
-        moves_applied = cycles
+        moves_attempted = cycles
     else:
-        moves_applied = cycles * model.num_labels
+        moves_attempted = cycles * model.num_labels
     return {
         "cycles": cycles,
-        "moves_applied": moves_applied,
+        "moves_attempted": moves_attempted,
         "initial_energy": initial_energy,
         "final_energy": model.evaluate_total_energy(),
         "wall_seconds": elapsed,
