@@ -12,6 +12,32 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "b
 import numpy as np
 import alpha_expansion_py as ae
 from datasets import load_community_graph
+from networkx.algorithms.community.quality import modularity as nx_modularity
+
+
+def ground_truth(name, G):
+    if name == "karate":
+        return [0 if G.nodes[n]["club"] == "Mr. Hi" else 1 for n in G.nodes()]
+    if name == "football":
+        return [int(G.nodes[n]["value"]) for n in G.nodes()]
+    return None
+
+
+def compute_quality(name, G, labels, node_to_idx):
+    pred_per_node = [labels[node_to_idx[n]] for n in G.nodes()]
+    gt = ground_truth(name, G)
+    if gt is not None:
+        from sklearn.metrics import normalized_mutual_info_score
+        nmi = float(normalized_mutual_info_score(gt, pred_per_node))
+    else:
+        nmi = None
+
+    groups = {}
+    for n, lbl in zip(G.nodes(), pred_per_node):
+        groups.setdefault(lbl, set()).add(n)
+    q = float(nx_modularity(G, list(groups.values())))
+    return nmi, q
+
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -99,9 +125,12 @@ def run_one_dataset(name, G, config, args):
         members = [idx_to_node[i] for i, l in enumerate(labels) if l == lbl]
         print(f"  Community {lbl} [{len(members)}]: {members[:8]}{'...' if len(members) > 8 else ''}")
 
+    nmi, q = compute_quality(name, G, labels, node_to_idx)
     return {"dataset": name, "solver": args.solver, "strategy": args.strategy,
             "nodes": num_nodes, "edges": G.number_of_edges(),
             "cycles": cycles, "final_energy": final_energy,
+            "nmi": "" if nmi is None else f"{nmi:.4f}",
+            "modularity": f"{q:.4f}",
             "labels": labels, "node_to_idx": node_to_idx}
 
 
@@ -131,7 +160,8 @@ def main():
 
     if args.output_csv:
         os.makedirs(os.path.dirname(os.path.abspath(args.output_csv)), exist_ok=True)
-        cols = ["dataset", "solver", "strategy", "nodes", "edges", "cycles", "final_energy"]
+        cols = ["dataset", "solver", "strategy", "nodes", "edges",
+                "cycles", "final_energy", "nmi", "modularity"]
         with open(args.output_csv, "w", newline="") as f:
             w = csv.DictWriter(f, fieldnames=cols)
             w.writeheader()
