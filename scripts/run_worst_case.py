@@ -18,11 +18,16 @@ def parse_args():
     p.add_argument("--solvers", default="bk")
     p.add_argument("--max-cycles", type=int, default=100000)
     p.add_argument("--no-plot", action="store_true")
+    p.add_argument("--from-csv", default=None)
     return p.parse_args()
 
 
 def main():
     args = parse_args()
+    if args.from_csv:
+        _plot_from_csv(args.from_csv)
+        return
+
     sizes = [int(s) for s in args.sizes.split(",")]
     strategies = args.strategies.split(",")
     solvers = args.solvers.split(",")
@@ -58,13 +63,25 @@ def main():
         _plot(rows)
 
 
+def _plot_from_csv(csv_path):
+    rows = []
+    with open(csv_path, newline="") as f:
+        for r in csv.DictReader(f):
+            rows.append({
+                "instance": r["instance"],
+                "size": r["size"],
+                "strategy": r["strategy"],
+                "moves_attempted": r["moves_attempted"],
+            })
+    _plot(rows)
+
+
 def _plot(rows):
     import numpy as np
     import matplotlib.pyplot as plt
     plot_dir = os.path.join(ROOT, "data", "plots", "worst_case")
     os.makedirs(plot_dir, exist_ok=True)
 
-    # reference exponent and label per instance
     ref_exp = {"chain": 1.0, "checkerboard": 0.5, "snake": 1.0}
     ref_label = {"chain": "O(n)", "checkerboard": "O(√n)", "snake": "O(n)"}
 
