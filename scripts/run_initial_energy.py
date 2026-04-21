@@ -158,18 +158,17 @@ def _scatter_plots(rows, key, out_dir):
     os.makedirs(out_dir, exist_ok=True)
     for group in {r[key] for r in rows}:
         fig, ax = plt.subplots(figsize=(7.5, 5))
-        for init in sorted({r["init"] for r in rows if r[key] == group}):
-            xs = [r["initial_energy"] for r in rows
-                  if r[key] == group and r["init"] == init]
-            ys = [r["moves_attempted"] for r in rows
-                  if r[key] == group and r["init"] == init]
-            ax.scatter(xs, ys, label=init, alpha=0.7)
-        ax.set_xlabel("initial energy")
+        inits_present = sorted({r["init"] for r in rows if r[key] == group})
+        data = []
+        for init in inits_present:
+            ys = [r["moves_attempted"] for r in rows if r[key] == group and r["init"] == init]
+            data.append(ys)
+        
+        ax.boxplot(data, tick_labels=inits_present)
         ax.set_ylabel("moves attempted")
-        ax.set_title(f"{group}: moves attempted vs initial energy")
-        ax.legend()
+        ax.set_title(f"{group}: moves attempted by initialization")
         ax.grid(alpha=0.3)
-        out = os.path.join(out_dir, f"{group}_scatter.png")
+        out = os.path.join(out_dir, f"{group}_boxplot.png")
         fig.tight_layout()
         fig.savefig(out, dpi=120)
         plt.close(fig)
