@@ -21,7 +21,7 @@ def psnr(a: np.ndarray, b: np.ndarray) -> float:
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--images", default="airplane,house,peppers")
-    p.add_argument("--num-labels", type=int, default=256)
+    p.add_argument("--num-labels", type=int, default=16)
     p.add_argument("--sigma", type=float, default=20.0)
     p.add_argument("--lambda-smooth", type=int, default=750)
     p.add_argument("--strategies", default="sequential,greedy,randomized")
