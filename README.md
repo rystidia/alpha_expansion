@@ -22,7 +22,8 @@ Guides available in `docs/guides/`:
 ## Folders
 - `src/`: The main C++ code.
 - `tests/`: C++ unit tests (we use GoogleTest).
-- `scripts/`: Python scripts for running experiments and visualizing results.
+- `scripts/`: Python scripts for running experiments and producing plots.
+- `demo/`: Interactive PyQt6 demo for image segmentation and community detection.
 
 ## How to Build
 
@@ -61,13 +62,16 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-After you build the project, you can run our example scripts:
+After you build the project, you can run the example scripts:
 ```bash
-# See community detection with graphs
-python scripts/run_community.py --visualize
+# Stereo, restoration, segmentation, community-detection experiments
+python scripts/run_middlebury.py
+python scripts/run_restoration.py
+python scripts/run_segmentation.py
+python scripts/run_community.py
 
-# Watch how alpha-expansion works step-by-step
-python scripts/trace_alpha_expansion.py
+# Interactive demo (image segmentation + community detection)
+python -m demo.interactive_segmentation
 ```
 
 If you want to write your own Python code, just add the build folder to your path:
@@ -102,8 +106,8 @@ Here is a simple example using the built-in ones:
 EnergyModel<int> model(10, 3);
 
 // Tell the optimizer how to create the solver (you can plug in your own here!)
-auto solver_factory = [](int v, int e) { 
-    return std::make_unique<BKSolver<int>>(v, e); 
+auto solver_factory = [](int v, int e) {
+    return std::make_unique<BKSolver<int>>(v, e);
 };
 
 // Create the optimizer and run the strategy
@@ -126,8 +130,8 @@ This library is based on academic research on graph cuts. The alpha-expansion al
 - *Efficiently Solving Dynamic Markov Random Fields Using Graph Cuts.* Pushmeet Kohli and Philip H.S. Torr. ICCV 2005.
 
 ## License and Copyright
-This project implements the alpha-expansion algorithm and includes the Boykov-Kolmogorov max-flow solver (`src/bk_maxflow_impl`). 
+This project implements the alpha-expansion algorithm and includes the Boykov-Kolmogorov max-flow solver (`src/bk_maxflow_impl`).
 
-The included max-flow solver was developed by Yuri Boykov and Vladimir Kolmogorov. Its license strictly restricts its use to **research purposes only**. Commercial use is not permitted. Therefore, this entire library—including its modifications, wrappers, and Python bindings—can be used and distributed for academic and non-commercial projects only. 
+The included max-flow solver was developed by Yuri Boykov and Vladimir Kolmogorov. Its license strictly restricts its use to **research purposes only**. Commercial use is not permitted. Therefore, this entire library—including its modifications, wrappers, and Python bindings—can be used and distributed for academic and non-commercial projects only.
 
 If you use this library in your research, you **must** cite the four publications listed in the References section above, as per the original authors' licensing requirements.
