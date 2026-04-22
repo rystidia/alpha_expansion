@@ -94,7 +94,11 @@ void bind_types(py::module &m, const std::string &type_suffix) {
             } else {
                 throw std::invalid_argument("Unknown solver type: " + solver_type + ". Use 'bk' or 'ortools'.");
             }
-            return std::make_unique<AlphaExpansion<T>>(model, factory);
+            auto optimizer = std::make_unique<AlphaExpansion<T>>(model, factory);
+            optimizer->set_on_iteration([] {
+                if (PyErr_CheckSignals() != 0) throw py::error_already_set();
+            });
+            return optimizer;
         }), py::arg("model"), py::arg("solver_type") = "bk",
         "Create an optimizer for *model*.\n\n"
         ":param model: The ``EnergyModel`` to optimize. Must outlive this object.\n"

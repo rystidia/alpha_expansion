@@ -31,6 +31,12 @@ public:
         : model_(model), solver_factory_(std::move(solver_factory)) {
     }
 
+    /// @brief Installs a callback invoked at the start of every `perform_expansion_move`.
+    ///
+    /// Used by the Python bindings to check for pending signals (Ctrl+C) so that long
+    /// strategy runs can be interrupted.
+    void set_on_iteration(std::function<void()> cb) { on_iteration_ = std::move(cb); }
+
     /// @brief Attempts a single alpha-expansion move for @p alpha_label.
     ///
     /// Builds the binary subgraph for @p alpha_label and runs max-flow. If the resulting
@@ -39,6 +45,7 @@ public:
     /// @param alpha_label The label to expand (0 ≤ alpha_label < num_labels).
     /// @return `true` if any node's label changed and energy decreased; `false` otherwise.
     [[nodiscard]] bool perform_expansion_move(const int alpha_label) const {
+        on_iteration_();
         const std::vector<int> active_nodes = model_.get_active_nodes(alpha_label);
         if (active_nodes.empty()) return false;
 
@@ -129,4 +136,5 @@ private:
 
     EnergyModel<T> &model_;
     SolverFactory solver_factory_;
+    std::function<void()> on_iteration_ = []{};
 };
