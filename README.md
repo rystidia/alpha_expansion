@@ -91,6 +91,8 @@ strategy = ae.SequentialStrategyInt(max_cycles=100)
 cycles = strategy.execute(optimizer, model)
 ```
 
+`strategy.execute(...)` is interruptible with Ctrl+C. The signal is checked between expansion moves, so the run aborts after the current move finishes (a single max-flow solve) and `KeyboardInterrupt` is raised in Python.
+
 ## How to use in C++
 The library is written in C++, so you can include it in your own code. Because the solver and strategy are decoupled, you can also write your own custom Max-Flow solvers or new expansion strategies by implementing the `MaxFlowSolver` and `ExpansionStrategy` interfaces!
 

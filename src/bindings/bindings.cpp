@@ -102,11 +102,14 @@ void bind_types(py::module &m, const std::string &type_suffix) {
         }), py::arg("model"), py::arg("solver_type") = "bk",
         "Create an optimizer for *model*.\n\n"
         ":param model: The ``EnergyModel`` to optimize. Must outlive this object.\n"
-        ":param solver_type: Max-flow backend -- ``'bk'`` (default) or ``'ortools'``.")
+        ":param solver_type: Max-flow backend -- ``'bk'`` (default) or ``'ortools'``.\n\n"
+        "The Python binding installs a per-move signal check, so any call into this "
+        "optimizer (directly or via a strategy) can be interrupted with Ctrl+C.")
         .def("perform_expansion_move", &AlphaExpansion<T>::perform_expansion_move,
              py::arg("alpha_label"),
              "Attempt one alpha-expansion move for *alpha_label*.\n\n"
-             "Returns ``True`` if any node changed its label and energy decreased.");
+             "Returns ``True`` if any node changed its label and energy decreased.\n"
+             "Raises ``KeyboardInterrupt`` if Ctrl+C was pressed before this call.");
 
     std::string seq_name = "SequentialStrategy" + type_suffix;
     py::class_<SequentialStrategy<T>>(m, seq_name.c_str(),
@@ -114,7 +117,8 @@ void bind_types(py::module &m, const std::string &type_suffix) {
         .def(py::init<int>(), py::arg("max_cycles") = 100,
              ":param max_cycles: Maximum number of full cycles (default: 100).")
         .def("execute", &SequentialStrategy<T>::execute, py::arg("optimizer"), py::arg("model"),
-             "Run sequential alpha-expansion. Returns the number of cycles completed.");
+             "Run sequential alpha-expansion. Returns the number of cycles completed.\n"
+             "Interruptible with Ctrl+C between expansion moves (raises ``KeyboardInterrupt``).");
 
     std::string greedy_name = "GreedyStrategy" + type_suffix;
     py::class_<GreedyStrategy<T>>(m, greedy_name.c_str(),
@@ -122,7 +126,8 @@ void bind_types(py::module &m, const std::string &type_suffix) {
         .def(py::init<int>(), py::arg("max_cycles") = 100,
              ":param max_cycles: Maximum number of greedy cycles (default: 100).")
         .def("execute", &GreedyStrategy<T>::execute, py::arg("optimizer"), py::arg("model"),
-             "Run greedy alpha-expansion. Returns the number of cycles completed.");
+             "Run greedy alpha-expansion. Returns the number of cycles completed.\n"
+             "Interruptible with Ctrl+C between expansion moves (raises ``KeyboardInterrupt``).");
 
     std::string rand_name = "RandomizedStrategy" + type_suffix;
     py::class_<RandomizedStrategy<T>>(m, rand_name.c_str(),
@@ -131,7 +136,8 @@ void bind_types(py::module &m, const std::string &type_suffix) {
              ":param max_cycles: Maximum number of cycles (default: 100).\n"
              ":param seed: RNG seed for reproducibility (default: 42).")
         .def("execute", &RandomizedStrategy<T>::execute, py::arg("optimizer"), py::arg("model"),
-             "Run randomized alpha-expansion. Returns the number of cycles completed.");
+             "Run randomized alpha-expansion. Returns the number of cycles completed.\n"
+             "Interruptible with Ctrl+C between expansion moves (raises ``KeyboardInterrupt``).");
 }
 
 PYBIND11_MODULE(alpha_expansion_py, m) {
