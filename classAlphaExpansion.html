@@ -93,6 +93,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a86d503a9f0be02b211009d885e1d3c97" id="r_a86d503a9f0be02b211009d885e1d3c97"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAlphaExpansion.html#a86d503a9f0be02b211009d885e1d3c97">AlphaExpansion</a> (<a class="el" href="classEnergyModel.html">EnergyModel</a>&lt; T &gt; &amp;model, <a class="el" href="classAlphaExpansion.html#a8197e87b9d5d9e0ed35db2bfb10939d3">SolverFactory</a> solver_factory)</td></tr>
 <tr class="memdesc:a86d503a9f0be02b211009d885e1d3c97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the optimizer.  <br /></td></tr>
 <tr class="separator:a86d503a9f0be02b211009d885e1d3c97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68e3b778cb3fdb3766a262f33d139f37" id="r_a68e3b778cb3fdb3766a262f33d139f37"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAlphaExpansion.html#a68e3b778cb3fdb3766a262f33d139f37">set_on_iteration</a> (std::function&lt; void()&gt; cb)</td></tr>
+<tr class="memdesc:a68e3b778cb3fdb3766a262f33d139f37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Installs a callback invoked at the start of every <code>perform_expansion_move</code>.  <br /></td></tr>
+<tr class="separator:a68e3b778cb3fdb3766a262f33d139f37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a239705a5ccb31b5ec28fcd99b8db9fa4" id="r_a239705a5ccb31b5ec28fcd99b8db9fa4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAlphaExpansion.html#a239705a5ccb31b5ec28fcd99b8db9fa4">perform_expansion_move</a> (const int alpha_label) const</td></tr>
 <tr class="memdesc:a239705a5ccb31b5ec28fcd99b8db9fa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts a single alpha-expansion move for <code>alpha_label</code>.  <br /></td></tr>
 <tr class="separator:a239705a5ccb31b5ec28fcd99b8db9fa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -216,6 +219,37 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if any node's label changed and energy decreased; <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a68e3b778cb3fdb3766a262f33d139f37" name="a68e3b778cb3fdb3766a262f33d139f37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68e3b778cb3fdb3766a262f33d139f37">&#9670;&#160;</a></span>set_on_iteration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classAlphaExpansion.html">AlphaExpansion</a>&lt; T &gt;::set_on_iteration </td>
+          <td>(</td>
+          <td class="paramtype">std::function&lt; void()&gt;&#160;</td>
+          <td class="paramname"><em>cb</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Installs a callback invoked at the start of every <code>perform_expansion_move</code>. </p>
+<p>Used by the Python bindings to check for pending signals (Ctrl+C) so that long strategy runs can be interrupted. </p>
 
 </div>
 </div>
