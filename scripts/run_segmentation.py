@@ -11,15 +11,21 @@ import alpha_expansion_py as ae
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 
-def make_seeds(rgb_shape, bbox, bg_margin=30, fg_inset=30):
-    h, w = rgb_shape[:2]
-    x, y, bw, bh = bbox
-    seeds = np.full((h, w), -1, dtype=np.int32)
-    seeds[:max(0, y - bg_margin), :] = 0
-    seeds[min(h, y + bh + bg_margin):, :] = 0
-    seeds[:, :max(0, x - bg_margin)] = 0
-    seeds[:, min(w, x + bw + bg_margin):] = 0
-    seeds[y + fg_inset: y + bh - fg_inset, x + fg_inset: x + bw - fg_inset] = 1
+def load_brush_seeds(name: str, rgb_shape) -> np.ndarray:
+    path = os.path.join(ROOT, "data", "segmentation", f"{name}_brush.png")
+    if not os.path.exists(path):
+        raise FileNotFoundError(
+            f"brush mask not found at {path}; paint one with the demo and save as PNG"
+        )
+    img = np.array(Image.open(path).convert("L"))
+    expected = rgb_shape[:2]
+    if img.shape != expected:
+        raise ValueError(
+            f"brush mask shape {img.shape} does not match image shape {expected}"
+        )
+    seeds = np.full(img.shape, -1, dtype=np.int32)
+    seeds[img == 255] = 1
+    seeds[img == 0] = 0
     return seeds
 
 
@@ -96,7 +102,8 @@ def main():
     comparison_data = []
     for name in args.images.split(","):
         rgb, gt, bbox = load_segmentation_image(name)
-        seeds = make_seeds(rgb.shape, bbox, bg_margin=0, fg_inset=85)
+        seeds = load_brush_seeds(name, rgb.shape)
+        h, w = rgb.shape[:2]
         best_mask, best_iou = None, -1.0
         for strategy in args.strategies.split(","):
             for solver in args.solvers.split(","):
@@ -113,7 +120,7 @@ def main():
                 rows.append(res)
                 print(f"{name:8} {strategy:10} {solver:8} "
                       f"cycles={res['cycles']:3} IoU={score:.3f}")
-        comparison_data.append((name, rgb, gt, best_mask, best_iou, bbox))
+        comparison_data.append((name, rgb, gt, best_mask, best_iou, seeds))
 
     cols = ["image", "strategy", "solver", "cycles", "moves_attempted",
             "initial_energy", "final_energy", "wall_seconds", "iou"]
@@ -128,17 +135,18 @@ def main():
 
 def _comparison_plot(comparison_data, plot_dir):
     import matplotlib.pyplot as plt
-    import matplotlib.patches as patches
     n = len(comparison_data)
     fig, axes = plt.subplots(n, 3, figsize=(12, 4 * n))
     if n == 1:
         axes = [axes]
-    for ax_row, (name, rgb, gt, best_mask, best_iou, bbox) in zip(axes, comparison_data):
-        x, y, bw, bh = bbox
+    for ax_row, (name, rgb, gt, best_mask, best_iou, seeds) in zip(axes, comparison_data):
+        h, w = seeds.shape
+        overlay = np.zeros((h, w, 4), dtype=np.uint8)
+        overlay[seeds == 1] = [255, 255, 255, 128]
+        overlay[seeds == 0] = [0, 0, 0, 128]
         ax_row[0].imshow(rgb)
-        ax_row[0].add_patch(patches.Rectangle(
-            (x, y), bw, bh, linewidth=2, edgecolor="red", facecolor="none"))
-        ax_row[0].set_title(f"{name}\noriginal + bbox")
+        ax_row[0].imshow(overlay)
+        ax_row[0].set_title(f"{name}\noriginal + brush")
         ax_row[0].axis("off")
         ax_row[1].imshow(gt, cmap="gray")
         ax_row[1].set_title("ground truth")
