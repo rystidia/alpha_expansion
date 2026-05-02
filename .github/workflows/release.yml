@@ -1,0 +1,185 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version tag (e.g. v0.1.0)'
+        required: true
+        type: string
+      publish:
+        description: 'Publish to GitHub Releases (false = build + smoke-test only, download from workflow artifacts)'
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    name: ${{ matrix.os }} (ortools=${{ matrix.use_ortools }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        use_ortools: [ON, OFF]
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.25.x'
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Compute package name
+      id: pkg
+      shell: bash
+      run: |
+        if [ "${{ matrix.use_ortools }}" = "ON" ]; then
+          ortools_suffix="with-ortools"
+        else
+          ortools_suffix="no-ortools"
+        fi
+        if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+          os_suffix="linux"
+        else
+          os_suffix="windows"
+        fi
+        echo "name=alpha_expansion-${{ inputs.version }}-${os_suffix}-${ortools_suffix}" >> "$GITHUB_OUTPUT"
+
+    - name: Install System Dependencies (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y zlib1g-dev libssl-dev libbz2-dev wget patchelf
+
+    - name: Download OR-Tools (Linux)
+      if: matrix.os == 'ubuntu-latest' && matrix.use_ortools == 'ON'
+      run: |
+        wget -qO ortools.tar.gz https://github.com/google/or-tools/releases/download/v9.15/or-tools_amd64_ubuntu-24.04_cpp_v9.15.6755.tar.gz
+        tar -xzf ortools.tar.gz
+        mv or-tools_x86_64_Ubuntu-24.04_cpp_v9.15.6755 ortools-lib
+
+    - name: Download OR-Tools (Windows)
+      if: matrix.os == 'windows-latest' && matrix.use_ortools == 'ON'
+      shell: pwsh
+      run: |
+        Invoke-WebRequest -Uri "https://github.com/google/or-tools/releases/download/v9.15/or-tools_x64_VisualStudio2022_cpp_v9.15.6755.zip" -OutFile "ortools.zip"
+        Expand-Archive -Path "ortools.zip" -DestinationPath "."
+        Rename-Item -Path "or-tools_x64_VisualStudio2022_cpp_v9.15.6755" -NewName "ortools-lib"
+
+    - name: Configure CMake (with OR-Tools)
+      if: matrix.use_ortools == 'ON'
+      run: >
+        cmake -B build
+        -DCMAKE_BUILD_TYPE=Release
+        -DUSE_OR_TOOLS=ON
+        -DCMAKE_PREFIX_PATH="${{ github.workspace }}/ortools-lib"
+        -Dortools_DIR="${{ github.workspace }}/ortools-lib/lib/cmake/ortools"
+
+    - name: Configure CMake (without OR-Tools)
+      if: matrix.use_ortools == 'OFF'
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DUSE_OR_TOOLS=OFF
+
+    - name: Build
+      run: cmake --build build --config Release -j 4
+
+    - name: Package (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        PKG="${{ steps.pkg.outputs.name }}"
+        mkdir -p "$PKG"
+        cp build/alpha_expansion_py*.so "$PKG/"
+        cp README.md "$PKG/"
+        if [ "${{ matrix.use_ortools }}" = "ON" ]; then
+          cp -a ortools-lib/lib/*.so* "$PKG/" 2>/dev/null || true
+          patchelf --set-rpath '$ORIGIN' "$PKG"/alpha_expansion_py*.so
+        fi
+        zip -r "$PKG.zip" "$PKG"
+
+    - name: Package (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: |
+        $pkg = "${{ steps.pkg.outputs.name }}"
+        New-Item -ItemType Directory -Force -Path $pkg | Out-Null
+        Copy-Item -Path "build\Release\*.pyd" -Destination $pkg -Force
+        Copy-Item -Path "README.md" -Destination $pkg -Force
+        if ('${{ matrix.use_ortools }}' -eq 'ON') {
+          Copy-Item -Path "ortools-lib\bin\*.dll" -Destination $pkg -Force -ErrorAction SilentlyContinue
+          Copy-Item -Path "ortools-lib\lib\*.dll" -Destination $pkg -Force -ErrorAction SilentlyContinue
+        }
+        Compress-Archive -Path $pkg -DestinationPath "$pkg.zip" -Force
+
+    - name: Smoke test (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        PKG="${{ steps.pkg.outputs.name }}"
+        WORK="$RUNNER_TEMP/smoke"
+        mkdir -p "$WORK"
+        unzip -q "$PKG.zip" -d "$WORK"
+        cd "$WORK/$PKG"
+        python - <<'PY'
+        import sys, os
+        sys.path.insert(0, os.getcwd())
+        import alpha_expansion_py as ae
+        m = ae.EnergyModel(4, 2, 'double')
+        print('EnergyModel OK')
+        if '${{ matrix.use_ortools }}' == 'ON':
+            opt = ae.AlphaExpansion(m, 'ortools')
+            print('AlphaExpansion(ortools) OK')
+        PY
+
+    - name: Smoke test (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: |
+        $pkg = "${{ steps.pkg.outputs.name }}"
+        $work = Join-Path $env:RUNNER_TEMP "smoke"
+        New-Item -ItemType Directory -Force -Path $work | Out-Null
+        Expand-Archive -Path "$pkg.zip" -DestinationPath $work -Force
+        Set-Location (Join-Path $work $pkg)
+        $useOrtools = '${{ matrix.use_ortools }}'
+        $script = @"
+        import sys, os
+        sys.path.insert(0, os.getcwd())
+        import alpha_expansion_py as ae
+        m = ae.EnergyModel(4, 2, 'double')
+        print('EnergyModel OK')
+        if '$useOrtools' == 'ON':
+            opt = ae.AlphaExpansion(m, 'ortools')
+            print('AlphaExpansion(ortools) OK')
+        "@
+        $script | python -
+
+    - name: Upload package
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.pkg.outputs.name }}
+        path: ${{ steps.pkg.outputs.name }}.zip
+        if-no-files-found: error
+
+  release:
+    name: Create draft release
+    needs: build
+    if: ${{ inputs.publish }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Download all packages
+      uses: actions/download-artifact@v4
+      with:
+        path: dist
+        pattern: alpha_expansion-*
+        merge-multiple: true
+
+    - name: Create draft release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ inputs.version }}
+        name: ${{ inputs.version }}
+        draft: true
+        files: dist/*.zip
