@@ -34,8 +34,7 @@ target_link_libraries(alpha_expansion_tests
   GTest::gtest_main
 )
 
-include(GoogleTest)
-gtest_discover_tests(alpha_expansion_tests)
+add_test(NAME alpha_expansion_tests COMMAND alpha_expansion_tests)
 
 # Google OR-Tools dependency
 option(USE_OR_TOOLS "Enable Google OR-Tools dependency" ON)
