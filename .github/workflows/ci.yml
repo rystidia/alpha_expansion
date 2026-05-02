@@ -6,7 +6,10 @@ on:
 
 jobs:
   build-cpp:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
     - uses: actions/checkout@v4
 
@@ -15,24 +18,34 @@ jobs:
       with:
         cmake-version: '3.25.x'
 
-    - name: Install System Dependencies
+    - name: Install System Dependencies (Linux)
+      if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
         sudo apt-get install -y zlib1g-dev libssl-dev libbz2-dev wget
 
-    - name: Download Precompiled OR-Tools
+    - name: Download Precompiled OR-Tools (Linux)
+      if: matrix.os == 'ubuntu-latest'
       run: |
         wget -qO ortools.tar.gz https://github.com/google/or-tools/releases/download/v9.15/or-tools_amd64_ubuntu-24.04_cpp_v9.15.6755.tar.gz
         tar -xzf ortools.tar.gz
         mv or-tools_x86_64_Ubuntu-24.04_cpp_v9.15.6755 ortools-lib
+
+    - name: Download Precompiled OR-Tools (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: |
+        Invoke-WebRequest -Uri "https://github.com/google/or-tools/releases/download/v9.15/or-tools_x64_VisualStudio2022_cpp_v9.15.6755.zip" -OutFile "ortools.zip"
+        Expand-Archive -Path "ortools.zip" -DestinationPath "."
+        Rename-Item -Path "or-tools_x64_VisualStudio2022_cpp_v9.15.6755" -NewName "ortools-lib"
 
     - name: Configure CMake
       run: >
         cmake -B build
         -DCMAKE_BUILD_TYPE=Release
         -DFETCHCONTENT_QUIET=OFF
-        -DCMAKE_PREFIX_PATH=${GITHUB_WORKSPACE}/ortools-lib
-        -Dortools_DIR=${GITHUB_WORKSPACE}/ortools-lib/lib/cmake/ortools
+        -DCMAKE_PREFIX_PATH="${{ github.workspace }}/ortools-lib"
+        -Dortools_DIR="${{ github.workspace }}/ortools-lib/lib/cmake/ortools"
 
     - name: Build Library and Bindings
       run: cmake --build build --config Release -j 4
@@ -40,7 +53,7 @@ jobs:
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: compiled-build
+        name: compiled-build-${{ matrix.os }}
         path: |
           build/
           ortools-lib/
@@ -48,23 +61,39 @@ jobs:
 
   test-cpp:
     needs: build-cpp
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
     - uses: actions/checkout@v4
     
     - name: Download Build Artifacts
       uses: actions/download-artifact@v4
       with:
-        name: compiled-build
+        name: compiled-build-${{ matrix.os }}
 
-    - name: Run C++ GoogleTests
+    - name: Run C++ GoogleTests (Linux)
+      if: matrix.os == 'ubuntu-latest'
       run: |
         chmod +x build/alpha_expansion_tests
         ./build/alpha_expansion_tests
 
+    - name: Run C++ GoogleTests (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: |
+        # Add OR-Tools to PATH for DLL resolution
+        echo "${{ github.workspace }}\ortools-lib\bin" >> $env:GITHUB_PATH
+        echo "${{ github.workspace }}\ortools-lib\lib" >> $env:GITHUB_PATH
+        .\build\Release\alpha_expansion_tests.exe
+
   test-python:
     needs: build-cpp
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
     - uses: actions/checkout@v4
 
@@ -74,7 +103,8 @@ jobs:
         python-version: '3.12'
         cache: 'pip'
 
-    - name: Install System Dependencies
+    - name: Install System Dependencies (Linux)
+      if: matrix.os == 'ubuntu-latest'
       run: sudo apt-get install -y libegl1
 
     - name: Install Python Dependencies
@@ -85,7 +115,15 @@ jobs:
     - name: Download Build Artifacts
       uses: actions/download-artifact@v4
       with:
-        name: compiled-build
+        name: compiled-build-${{ matrix.os }}
+
+    - name: Fix Windows Python Path & DLLs
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: |
+        Copy-Item -Path "build\Release\*.pyd" -Destination "build\" -Force
+        echo "${{ github.workspace }}\ortools-lib\bin" >> $env:GITHUB_PATH
+        echo "${{ github.workspace }}\ortools-lib\lib" >> $env:GITHUB_PATH
 
     - name: Run pytest
       run: python -m pytest tests/ -v
