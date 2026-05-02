@@ -307,15 +307,22 @@ TEST_P(AlphaExpansionTest, TestSnakeMRF) {
     run_TestSnakeMRF<double>(std::get<0>(params), std::get<1>(params));
 }
 
+#ifdef USE_OR_TOOLS
 INSTANTIATE_TEST_SUITE_P(
     AllCombinations,
     AlphaExpansionTest,
     ::testing::Combine(
-#ifdef USE_OR_TOOLS
         ::testing::Values(SolverType::BK, SolverType::ORTools),
-#else
-        ::testing::Values(SolverType::BK),
-#endif
         ::testing::Values(StrategyType::Sequential, StrategyType::Greedy, StrategyType::Randomized)
     )
 );
+#else
+INSTANTIATE_TEST_SUITE_P(
+    AllCombinations,
+    AlphaExpansionTest,
+    ::testing::Combine(
+        ::testing::Values(SolverType::BK),
+        ::testing::Values(StrategyType::Sequential, StrategyType::Greedy, StrategyType::Randomized)
+    )
+);
+#endif
