@@ -125,7 +125,7 @@ jobs:
         import sys, os
         sys.path.insert(0, os.getcwd())
         import alpha_expansion_py as ae
-        m = ae.EnergyModel(4, 2, 'double')
+        m = ae.EnergyModel(4, 2, 'float64')
         print('EnergyModel OK')
         if '${{ matrix.use_ortools }}' == 'ON':
             opt = ae.AlphaExpansion(m, 'ortools')
@@ -146,7 +146,7 @@ jobs:
         import sys, os
         sys.path.insert(0, os.getcwd())
         import alpha_expansion_py as ae
-        m = ae.EnergyModel(4, 2, 'double')
+        m = ae.EnergyModel(4, 2, 'float64')
         print('EnergyModel OK')
         if '$useOrtools' == 'ON':
             opt = ae.AlphaExpansion(m, 'ortools')
