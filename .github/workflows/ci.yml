@@ -38,6 +38,8 @@ jobs:
         Invoke-WebRequest -Uri "https://github.com/google/or-tools/releases/download/v9.15/or-tools_x64_VisualStudio2022_cpp_v9.15.6755.zip" -OutFile "ortools.zip"
         Expand-Archive -Path "ortools.zip" -DestinationPath "."
         Rename-Item -Path "or-tools_x64_VisualStudio2022_cpp_v9.15.6755" -NewName "ortools-lib"
+        echo "${{ github.workspace }}\ortools-lib\bin" >> $env:GITHUB_PATH
+        echo "${{ github.workspace }}\ortools-lib\lib" >> $env:GITHUB_PATH
 
     - name: Configure CMake
       run: >
@@ -77,16 +79,17 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         chmod +x build/alpha_expansion_tests
-        ./build/alpha_expansion_tests
+        cd build
+        ctest --output-on-failure
 
     - name: Run C++ GoogleTests (Windows)
       if: matrix.os == 'windows-latest'
       shell: pwsh
       run: |
-        # Add OR-Tools to PATH for DLL resolution
-        echo "${{ github.workspace }}\ortools-lib\bin" >> $env:GITHUB_PATH
-        echo "${{ github.workspace }}\ortools-lib\lib" >> $env:GITHUB_PATH
-        .\build\Release\alpha_expansion_tests.exe
+        # Prepend OR-Tools to PATH for DLL resolution (prevents conflicts with system DLLs)
+        $env:PATH = "${{ github.workspace }}\ortools-lib\bin;${{ github.workspace }}\ortools-lib\lib;" + $env:PATH
+        cd build
+        ctest -C Release --output-on-failure
 
   test-python:
     needs: build-cpp
@@ -122,8 +125,9 @@ jobs:
       shell: pwsh
       run: |
         Copy-Item -Path "build\Release\*.pyd" -Destination "build\" -Force
-        echo "${{ github.workspace }}\ortools-lib\bin" >> $env:GITHUB_PATH
-        echo "${{ github.workspace }}\ortools-lib\lib" >> $env:GITHUB_PATH
+        # Python 3.8+ on Windows ignores PATH for DLLs. We must copy them next to the .pyd.
+        Copy-Item -Path "${{ github.workspace }}\ortools-lib\bin\*.dll" -Destination "build\" -Force -ErrorAction SilentlyContinue
+        Copy-Item -Path "${{ github.workspace }}\ortools-lib\lib\*.dll" -Destination "build\" -Force -ErrorAction SilentlyContinue
 
     - name: Run pytest
       run: python -m pytest tests/ -v
