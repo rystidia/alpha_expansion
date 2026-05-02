@@ -125,11 +125,11 @@ jobs:
         import sys, os
         sys.path.insert(0, os.getcwd())
         import alpha_expansion_py as ae
-        m = ae.EnergyModel(4, 2, 'float64')
+        m = ae.EnergyModel(4, 2, 'int32')
         print('EnergyModel OK')
         if '${{ matrix.use_ortools }}' == 'ON':
-            opt = ae.AlphaExpansion(m, 'ortools')
-            print('AlphaExpansion(ortools) OK')
+            opt = ae.AlphaExpansionInt(m, 'ortools')
+            print('AlphaExpansionInt(ortools) OK')
         PY
 
     - name: Smoke test (Windows)
@@ -146,11 +146,11 @@ jobs:
         import sys, os
         sys.path.insert(0, os.getcwd())
         import alpha_expansion_py as ae
-        m = ae.EnergyModel(4, 2, 'float64')
+        m = ae.EnergyModel(4, 2, 'int32')
         print('EnergyModel OK')
         if '$useOrtools' == 'ON':
-            opt = ae.AlphaExpansion(m, 'ortools')
-            print('AlphaExpansion(ortools) OK')
+            opt = ae.AlphaExpansionInt(m, 'ortools')
+            print('AlphaExpansionInt(ortools) OK')
         "@
         $script | python -
 
