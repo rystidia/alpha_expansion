@@ -54,6 +54,37 @@ cmake -B build -S . -DUSE_OR_TOOLS=OFF
 cmake --build build -j$(nproc)
 ```
 
+## Installing from a Release
+
+Prebuilt artifacts for each release are on the [Releases page](https://github.com/rystidia/alpha_expansion/releases).
+
+### C++ (prebuilt static library)
+
+Download `alpha_expansion-vX.Y.Z-linux.zip` or `-windows.zip`. Each contains the compiled bk solver, headers, and CMake config files. Extract it and point your project at it via `CMAKE_PREFIX_PATH`:
+
+```cmake
+find_package(alpha_expansion REQUIRED)
+target_link_libraries(my_app PRIVATE alpha_expansion::graph_cuts)
+```
+
+```bash
+cmake -B build -DCMAKE_PREFIX_PATH=/path/to/alpha_expansion-vX.Y.Z-linux
+```
+
+### Python (source distribution)
+
+Download `alpha_expansion-vX.Y.Z-sdist.tar.gz` and install it with pip — pip will compile the C++ extension on your machine for whichever Python version you have, so you need a C++ compiler and CMake installed:
+
+```bash
+pip install alpha_expansion-0.1.0.tar.gz
+```
+
+By default this builds without OR-Tools. To build the OR-Tools solver in (you need OR-Tools installed and findable by CMake first):
+
+```bash
+pip install alpha_expansion-0.1.0.tar.gz --config-settings=cmake.define.USE_OR_TOOLS=ON
+```
+
 ## How to use in Python
 First, create a virtual environment and install the needed packages:
 ```bash

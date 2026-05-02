@@ -1,0 +1,33 @@
+[build-system]
+requires = ["scikit-build-core>=0.10"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "alpha-expansion"
+version = "0.1.0"
+description = "Python bindings for the Alpha-Expansion algorithm with Boykov-Kolmogorov and OR-Tools max-flow solvers."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "Research and academic use only - see README" }
+authors = [{ name = "rystidia" }]
+keywords = ["graph-cuts", "alpha-expansion", "computer-vision", "energy-minimization"]
+
+[project.urls]
+Homepage = "https://github.com/rystidia/alpha_expansion"
+Documentation = "https://rystidia.github.io/alpha_expansion/"
+
+[tool.scikit-build]
+cmake.version = ">=3.14"
+cmake.build-type = "Release"
+build.targets = ["alpha_expansion_py"]
+cmake.define = { USE_OR_TOOLS = "OFF" }
+sdist.exclude = [
+  ".github",
+  ".gitignore",
+  "Doxyfile",
+  "demo",
+  "docs",
+  "requirements.txt",
+  "scripts",
+  "tests",
+]
