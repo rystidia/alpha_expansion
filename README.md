@@ -28,9 +28,9 @@ Guides available in `docs/guides/`:
 ## How to Build
 
 ### System Dependencies
-You need the Python development headers for the Python bindings:
+You need the Python development headers for the Python bindings. If you plan to build with OR-Tools enabled, you also need bzip2, OpenSSL and zlib development headers, since the OR-Tools binary distribution links against them:
 ```bash
-sudo apt-get install -y python3-dev
+sudo apt-get install -y python3-dev libbz2-dev libssl-dev zlib1g-dev
 ```
 
 ### Installing OR-Tools
@@ -42,13 +42,13 @@ sudo tar -xzf /path/to/your/ortools.tar.gz -C /opt/ortools --strip-components=1
 
 ### Building
 ```bash
-cmake -B build -S .
+cmake -B build -S . -DCMAKE_PREFIX_PATH=/opt/ortools
 cmake --build build -j$(nproc)
 ```
 
-CMake will find OR-Tools automatically if installed to `/opt/ortools`, as CMake searches `/opt/<name>` by convention on Unix.
+The `CMAKE_PREFIX_PATH` flag is needed so that OR-Tools' bundled CMake configs for its own dependencies (Abseil, Protobuf, SCIP and others, all shipped under `/opt/ortools/lib/cmake/`) can be found. Without it the configure step fails with "Could not find a package configuration file provided by `absl`" or similar.
 
-If you don't want to install OR-Tools, you can disable it:
+If you don't want to install OR-Tools, you can disable it (no extra system deps or prefix path needed):
 ```bash
 cmake -B build -S . -DUSE_OR_TOOLS=OFF
 cmake --build build -j$(nproc)
