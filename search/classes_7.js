@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sequentialstrategy_0',['SequentialStrategy',['../classSequentialStrategy.html',1,'']]]
+  ['randomizedstrategy_0',['RandomizedStrategy',['../classRandomizedStrategy.html',1,'']]]
 ];

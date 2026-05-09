@@ -71,6 +71,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classEnergyModel-members.html">List of all members</a>  </div>
@@ -83,6 +84,12 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="EnergyModel_8hpp_source.html">EnergyModel.hpp</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEnergyModel_1_1NeighborRange.html">NeighborRange</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lightweight contiguous range over a node's neighbours.  <a href="classEnergyModel_1_1NeighborRange.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:ab110cbb8bdfcfc93a57bddc79df1157b" id="r_ab110cbb8bdfcfc93a57bddc79df1157b"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEnergyModel.html#ab110cbb8bdfcfc93a57bddc79df1157b">UnaryCostFn</a> = std::function&lt; T(int node, int label)&gt;</td></tr>
@@ -144,6 +151,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a14d812744925499b743b21517e7431e9" id="r_a14d812744925499b743b21517e7431e9"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEnergyModel.html#a14d812744925499b743b21517e7431e9">get_neighbors</a> (int node) const</td></tr>
 <tr class="memdesc:a14d812744925499b743b21517e7431e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the neighbours of <code>node</code>.  <br /></td></tr>
 <tr class="separator:a14d812744925499b743b21517e7431e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd7c44313af582573a04cf04dfcb619c" id="r_acd7c44313af582573a04cf04dfcb619c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classEnergyModel_1_1NeighborRange.html">NeighborRange</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEnergyModel.html#acd7c44313af582573a04cf04dfcb619c">get_neighbors_range</a> (int node) const</td></tr>
+<tr class="memdesc:acd7c44313af582573a04cf04dfcb619c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the neighbours of <code>node</code> as a contiguous range.  <br /></td></tr>
+<tr class="separator:acd7c44313af582573a04cf04dfcb619c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5d473f90b177f88d9f5bd187de5c024" id="r_aa5d473f90b177f88d9f5bd187de5c024"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEnergyModel.html#aa5d473f90b177f88d9f5bd187de5c024">get_active_nodes</a> (int alpha_label) const</td></tr>
 <tr class="memdesc:aa5d473f90b177f88d9f5bd187de5c024"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the indices of all nodes that do not currently have <code>alpha_label</code>.  <br /></td></tr>
 <tr class="separator:aa5d473f90b177f88d9f5bd187de5c024"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -517,6 +527,37 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns the neighbours of <code>node</code>. </p>
+
+</div>
+</div>
+<a id="acd7c44313af582573a04cf04dfcb619c" name="acd7c44313af582573a04cf04dfcb619c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd7c44313af582573a04cf04dfcb619c">&#9670;&#160;</a></span>get_neighbors_range()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classEnergyModel_1_1NeighborRange.html">NeighborRange</a> <a class="el" href="classEnergyModel.html">EnergyModel</a>&lt; T &gt;::get_neighbors_range </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>node</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the neighbours of <code>node</code> as a contiguous range. </p>
+<p>Faster than <code><a class="el" href="classEnergyModel.html#a14d812744925499b743b21517e7431e9" title="Returns the neighbours of node.">get_neighbors()</a></code> for tight inner loops because the underlying storage is a single flat array (CSR layout). The CSR view is built lazily on first access and invalidated by <code><a class="el" href="classEnergyModel.html#ad54c5dacb9b2b8d6f1e96482207b08ae" title="Adds an undirected edge between node1 and node2.">add_neighbor()</a></code>. </p>
 
 </div>
 </div>

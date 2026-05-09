@@ -14,12 +14,13 @@ var searchData=
   ['setting_20costs_11',['Setting Costs',['../md_docs_2guides_2python-api.html#autotoc_md38',1,'']]],
   ['setup_12',['Setup',['../md_docs_2guides_2python-api.html#autotoc_md36',1,'']]],
   ['single_20pass_20strategy_13',['Example: Single-Pass Strategy',['../md_docs_2guides_2custom-strategy.html#autotoc_md13',1,'']]],
-  ['solver_14',['Implementing a Custom Max-Flow Solver',['../md_docs_2guides_2custom-solver.html',1,'']]],
-  ['solverfactory_15',['SolverFactory',['../classAlphaExpansion.html#a8197e87b9d5d9e0ed35db2bfb10939d3',1,'AlphaExpansion']]],
-  ['started_16',['Getting Started',['../md_docs_2guides_2getting-started.html',1,'']]],
-  ['step_20by_20step_20control_17',['Step-by-Step Control',['../md_docs_2guides_2python-api.html#autotoc_md42',1,'']]],
-  ['step_20by_20step_20example_18',['Step-by-Step Example',['../md_docs_2guides_2custom-solver.html#autotoc_md7',1,'']]],
-  ['strategy_19',['strategy',['../md_docs_2guides_2custom-strategy.html#autotoc_md13',1,'Example: Single-Pass Strategy'],['../md_docs_2guides_2custom-strategy.html',1,'Implementing a Custom Expansion Strategy'],['../md_docs_2guides_2custom-strategy.html#autotoc_md14',1,'Using the Custom Strategy']]],
-  ['structure_20',['Graph Structure',['../md_docs_2guides_2python-api.html#autotoc_md39',1,'']]],
-  ['system_20requirements_21',['System Requirements',['../md_docs_2guides_2getting-started.html#autotoc_md25',1,'']]]
+  ['size_14',['size',['../classEnergyModel_1_1NeighborRange.html#aa3b0a60b9b1c0af0baeaba419c8a2c68',1,'EnergyModel::NeighborRange']]],
+  ['solver_15',['Implementing a Custom Max-Flow Solver',['../md_docs_2guides_2custom-solver.html',1,'']]],
+  ['solverfactory_16',['SolverFactory',['../classAlphaExpansion.html#a8197e87b9d5d9e0ed35db2bfb10939d3',1,'AlphaExpansion']]],
+  ['started_17',['Getting Started',['../md_docs_2guides_2getting-started.html',1,'']]],
+  ['step_20by_20step_20control_18',['Step-by-Step Control',['../md_docs_2guides_2python-api.html#autotoc_md42',1,'']]],
+  ['step_20by_20step_20example_19',['Step-by-Step Example',['../md_docs_2guides_2custom-solver.html#autotoc_md7',1,'']]],
+  ['strategy_20',['strategy',['../md_docs_2guides_2custom-strategy.html#autotoc_md13',1,'Example: Single-Pass Strategy'],['../md_docs_2guides_2custom-strategy.html',1,'Implementing a Custom Expansion Strategy'],['../md_docs_2guides_2custom-strategy.html#autotoc_md14',1,'Using the Custom Strategy']]],
+  ['structure_21',['Graph Structure',['../md_docs_2guides_2python-api.html#autotoc_md39',1,'']]],
+  ['system_20requirements_22',['System Requirements',['../md_docs_2guides_2getting-started.html#autotoc_md25',1,'']]]
 ];

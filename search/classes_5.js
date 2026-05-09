@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ortoolssolver_0',['ORToolsSolver',['../classORToolsSolver.html',1,'']]]
+  ['neighborrange_0',['NeighborRange',['../classEnergyModel_1_1NeighborRange.html',1,'EnergyModel']]]
 ];

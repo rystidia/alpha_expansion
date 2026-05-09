@@ -1,7 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classMaxFlowSolver.html" title="Abstract interface for a binary max&#45;flow / QPBO solver." alt="" coords="5,31,165,56"/>
-<area shape="rect" id="Node000001" href="$classBKSolver.html" title="MaxFlowSolver backed by the Boykov–Kolmogorov max&#45;flow algorithm." alt="" coords="230,5,349,31"/>
-<area shape="poly" id="edge4_Node000000_Node000001" title=" " alt="" coords="179,29,229,23,230,28,180,34"/>
-<area shape="rect" id="Node000002" href="$classORToolsSolver.html" title="MaxFlowSolver backed by Google OR&#45;Tools SimpleMaxFlow." alt="" coords="213,55,365,80"/>
-<area shape="poly" id="edge5_Node000000_Node000002" title=" " alt="" coords="179,52,213,56,213,61,179,57"/>
+<area shape="rect" id="Node000000" href="$classExpansionStrategy.html" title="Abstract base class for alpha&#45;expansion iteration strategies." alt="" coords="5,55,188,80"/>
+<area shape="rect" id="Node000001" href="$classGreedyStrategy.html" title="Expansion strategy that always picks the label with the greatest energy reduction." alt="" coords="253,5,415,31"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="171,49,271,28,273,33,172,54"/>
+<area shape="rect" id="Node000002" href="$classRandomizedStrategy.html" title="Expansion strategy that shuffles the label order randomly each cycle." alt="" coords="236,55,432,80"/>
+<area shape="poly" id="edge2_Node000000_Node000002" title=" " alt="" coords="202,65,236,65,236,70,202,70"/>
+<area shape="rect" id="Node000003" href="$classSequentialStrategy.html" title="Expansion strategy that cycles through labels in fixed order 0, 1, …, K&#45;1." alt="" coords="242,104,426,129"/>
+<area shape="poly" id="edge3_Node000000_Node000003" title=" " alt="" coords="172,80,273,101,271,107,171,85"/>
 </map>
