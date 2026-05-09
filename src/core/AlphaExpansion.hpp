@@ -50,42 +50,36 @@ public:
         if (active_nodes.empty()) return false;
 
         std::vector<typename MaxFlowSolver<T>::Var> node_var_ids;
-        const auto solver = build_expansion_graph(alpha_label, active_nodes, node_var_ids);
+        T old_subgraph_energy = 0;
+        const auto solver = build_expansion_graph(alpha_label, active_nodes, node_var_ids, old_subgraph_energy);
 
-        solver->minimize();
+        const T new_subgraph_energy = solver->minimize();
+
+        bool improved;
+        if constexpr (std::is_floating_point_v<T>) {
+            improved = (old_subgraph_energy - new_subgraph_energy > static_cast<T>(1e-5));
+        } else {
+            improved = (new_subgraph_energy < old_subgraph_energy);
+        }
+        if (!improved) return false;
 
         bool changed = false;
-        std::vector<int> proposed_labels = model_.get_labels();
-
         for (const int node: active_nodes) {
             if (const typename MaxFlowSolver<T>::Var var = node_var_ids[node]; solver->get_var(var) == 0) {
-                proposed_labels[node] = alpha_label;
+                model_.set_label(node, alpha_label);
                 changed = true;
             }
         }
-
-        if (changed) {
-            T old_energy = model_.evaluate_total_energy();
-            T new_energy = model_.evaluate_total_energy(proposed_labels);
-            bool improved = false;
-            if constexpr (std::is_floating_point_v<T>) {
-                improved = (old_energy - new_energy > static_cast<T>(1e-5));
-            } else {
-                improved = (new_energy < old_energy);
-            }
-            if (improved) {
-                model_.set_labels(proposed_labels);
-                return true;
-            }
-        }
-
-        return false;
+        return changed;
     }
 
 private:
     /// Builds the binary QPBO subgraph for an alpha-expansion move and returns the solver.
+    /// Also computes the subgraph energy under the current labels (the all-vars=1 setting),
+    /// so the caller can decide whether the move improves without re-walking the graph.
     std::unique_ptr<MaxFlowSolver<T>> build_expansion_graph(const int alpha_label, const std::vector<int> &active_nodes,
-                                                            std::vector<typename MaxFlowSolver<T>::Var> &node_var_ids) const {
+                                                            std::vector<typename MaxFlowSolver<T>::Var> &node_var_ids,
+                                                            T &old_subgraph_energy) const {
         const int num_active = active_nodes.size();
         if (num_active == 0) return nullptr;
 
@@ -99,12 +93,15 @@ private:
             node_var_ids[node] = solver->add_variable();
         }
 
+        T old_energy = 0;
+
         for (const int node: active_nodes) {
             const typename MaxFlowSolver<T>::Var var = node_var_ids[node];
             const int current_label = model_.get_label(node);
             const T e0 = model_.get_unary_cost(node, alpha_label);
             const T e1 = model_.get_unary_cost(node, current_label);
             solver->add_term1(var, e0, e1);
+            old_energy += e1;
         }
 
         for (const int node_i: active_nodes) {
@@ -121,16 +118,19 @@ private:
                         const T e10 = model_.get_pairwise_cost(node_i, node_j, current_label_i, alpha_label);
                         const T e11 = model_.get_pairwise_cost(node_i, node_j, current_label_i, current_label_j);
                         solver->add_term2(var_i, var_j, e00, e01, e10, e11);
+                        old_energy += e11;
                     }
                 } else {
                     const int current_label_j = model_.get_label(node_j);
                     const T e0 = model_.get_pairwise_cost(node_i, node_j, alpha_label, current_label_j);
                     const T e1 = model_.get_pairwise_cost(node_i, node_j, current_label_i, current_label_j);
                     solver->add_term1(var_i, e0, e1);
+                    old_energy += e1;
                 }
             }
         }
 
+        old_subgraph_energy = old_energy;
         return solver;
     }
 
