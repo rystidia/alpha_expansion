@@ -108,7 +108,7 @@ private:
             const int current_label_i = model_.get_label(node_i);
             const typename MaxFlowSolver<T>::Var var_i = node_var_ids[node_i];
 
-            for (const int node_j: model_.get_neighbors(node_i)) {
+            for (const int node_j: model_.get_neighbors_range(node_i)) {
                 if (node_var_ids[node_j] != -1) {
                     if (node_i < node_j) {
                         const typename MaxFlowSolver<T>::Var var_j = node_var_ids[node_j];

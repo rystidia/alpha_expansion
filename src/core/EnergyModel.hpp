@@ -127,6 +127,7 @@ public:
     void add_neighbor(int node1, int node2) {
         neighbors_[node1].push_back(node2);
         neighbors_[node2].push_back(node1);
+        neighbor_csr_valid_ = false;
     }
 
     /// @brief Populates a 4-connected grid neighbourhood for an image of size @p width × @p height.
@@ -147,6 +148,33 @@ public:
     /// @brief Returns the neighbours of @p node.
     [[nodiscard]] const std::vector<int>& get_neighbors(int node) const {
         return neighbors_[node];
+    }
+
+    /// @brief Lightweight contiguous range over a node's neighbours.
+    ///
+    /// Provides `begin()`, `end()` and `size()` so it can be iterated with a range-for.
+    class NeighborRange {
+    public:
+        NeighborRange(const int* begin, const int* end) : begin_(begin), end_(end) {}
+        [[nodiscard]] const int* begin() const { return begin_; }
+        [[nodiscard]] const int* end() const { return end_; }
+        [[nodiscard]] int size() const { return static_cast<int>(end_ - begin_); }
+    private:
+        const int* begin_;
+        const int* end_;
+    };
+
+    /// @brief Returns the neighbours of @p node as a contiguous range.
+    ///
+    /// Faster than `get_neighbors()` for tight inner loops because the underlying
+    /// storage is a single flat array (CSR layout). The CSR view is built lazily
+    /// on first access and invalidated by `add_neighbor()`.
+    [[nodiscard]] NeighborRange get_neighbors_range(int node) const {
+        if (!neighbor_csr_valid_) build_neighbor_csr();
+        const int begin = neighbor_offsets_[node];
+        const int end = neighbor_offsets_[node + 1];
+        const int* base = neighbor_data_.data();
+        return {base + begin, base + end};
     }
 
     /// @brief Returns the indices of all nodes that do not currently have @p alpha_label.
@@ -187,6 +215,20 @@ private:
         return (int64_t)a * num_nodes_ + b;
     }
 
+    void build_neighbor_csr() const {
+        neighbor_offsets_.assign(num_nodes_ + 1, 0);
+        size_t total = 0;
+        for (int i = 0; i < num_nodes_; ++i) total += neighbors_[i].size();
+        neighbor_data_.resize(total);
+        int pos = 0;
+        for (int i = 0; i < num_nodes_; ++i) {
+            neighbor_offsets_[i] = pos;
+            for (int j : neighbors_[i]) neighbor_data_[pos++] = j;
+        }
+        neighbor_offsets_[num_nodes_] = pos;
+        neighbor_csr_valid_ = true;
+    }
+
     int num_nodes_;
     int num_labels_;
     std::vector<int> labels_;
@@ -196,4 +238,8 @@ private:
     std::vector<T> unary_costs_;
     std::vector<T> pairwise_costs_;
     std::unordered_map<int64_t, T> edge_weights_;
+
+    mutable std::vector<int> neighbor_data_;
+    mutable std::vector<int> neighbor_offsets_;
+    mutable bool neighbor_csr_valid_ = false;
 };
