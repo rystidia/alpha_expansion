@@ -15,12 +15,18 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.os }}
+    name: ${{ matrix.arch_suffix }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            arch_suffix: linux-x86_64
+          - os: ubuntu-24.04-arm
+            arch_suffix: linux-aarch64
+          - os: windows-latest
+            arch_suffix: windows-x86_64
     steps:
     - uses: actions/checkout@v4
 
@@ -36,12 +42,7 @@ jobs:
       id: pkg
       shell: bash
       run: |
-        if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
-          os_suffix="linux"
-        else
-          os_suffix="windows"
-        fi
-        echo "name=alpha_expansion-${{ inputs.version }}-${os_suffix}" >> "$GITHUB_OUTPUT"
+        echo "name=alpha_expansion-${{ inputs.version }}-${{ matrix.arch_suffix }}" >> "$GITHUB_OUTPUT"
 
     - name: Configure CMake
       run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DUSE_OR_TOOLS=OFF
@@ -57,11 +58,11 @@ jobs:
         cp README.md "$PKG/"
 
     - name: Zip package (Linux)
-      if: matrix.os == 'ubuntu-latest'
+      if: runner.os == 'Linux'
       run: zip -r "${{ steps.pkg.outputs.name }}.zip" "${{ steps.pkg.outputs.name }}"
 
     - name: Zip package (Windows)
-      if: matrix.os == 'windows-latest'
+      if: runner.os == 'Windows'
       shell: pwsh
       run: Compress-Archive -Path "${{ steps.pkg.outputs.name }}" -DestinationPath "${{ steps.pkg.outputs.name }}.zip" -Force
 
@@ -92,7 +93,7 @@ jobs:
         CM
         cmake -S "$WORK" -B "$WORK/build" -DCMAKE_PREFIX_PATH="$WORK/$PKG"
         cmake --build "$WORK/build" --config Release
-        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+        if [ "${{ runner.os }}" = "Windows" ]; then
           "$WORK/build/Release/smoke.exe"
         else
           "$WORK/build/smoke"

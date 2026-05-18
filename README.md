@@ -60,7 +60,7 @@ Prebuilt artifacts for each release are on the [Releases page](https://github.co
 
 ### C++ (prebuilt static library)
 
-Download `alpha_expansion-vX.Y.Z-linux.zip` or `-windows.zip`. Each contains the compiled bk solver, headers, and CMake config files. Extract it and point your project at it via `CMAKE_PREFIX_PATH`:
+Download the zip for your platform: `alpha_expansion-vX.Y.Z-linux-x86_64.zip`, `-linux-aarch64.zip` or `-windows-x86_64.zip`. Each contains the compiled bk solver, headers, and CMake config files. Extract it and point your project at it via `CMAKE_PREFIX_PATH`:
 
 ```cmake
 find_package(alpha_expansion REQUIRED)
@@ -68,8 +68,10 @@ target_link_libraries(my_app PRIVATE alpha_expansion::graph_cuts)
 ```
 
 ```bash
-cmake -B build -DCMAKE_PREFIX_PATH=/path/to/alpha_expansion-vX.Y.Z-linux
+cmake -B build -DCMAKE_PREFIX_PATH=/path/to/alpha_expansion-vX.Y.Z-linux-x86_64
 ```
+
+If your platform is not in the list above (for example macOS), use the Python sdist below or build from source via the [Building](#building) instructions.
 
 ### Python (source distribution)
 
